@@ -1,6 +1,19 @@
-import { Navbar } from "./components/Navbar";
+import React, { useState, useEffect } from "react";
+import { Navbar } from "../components/Navbar";
+import io from "socket.io-client";
 
-function App() {
+const socket = io("http://localhost:4000", {
+  withCredentials: true,
+});
+
+function Home() {
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected");
+    });
+  });
   return (
     <div className='App'>
       <Navbar />
@@ -26,4 +39,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home;
