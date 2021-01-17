@@ -18,8 +18,18 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("a user connected");
+  socket.on("join room", (data) => {
+    const { roomCode, clientName, clientId } = data;
+    console.log(roomCode + " " + clientName + " " + clientId);
+    socket.join(roomCode);
+  });
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
 });
 
-http.listen(4000, () => {
-  console.log("listening on 4000");
+const port = process.env.PORT || 4001;
+
+http.listen(port, () => {
+  console.log(`listening on ${port}`);
 });
