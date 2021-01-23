@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const server = require("http").createServer(app);
+const { addUser, createRoom, roomExists, getAllUsers } = require("./users");
 
 app.use(cors());
 
@@ -19,23 +20,25 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected");
 
-  socket.on("join room", (data) => {
-    const { roomCode, clientName } = data;
+  //joining a room
+  socket.on("join room", ({ roomCode, clientName }) => {
     console.log(
       "Room Code: " + roomCode + ", Name: " + clientName + ", Id: " + socket.id
     );
-    socket.nickname = clientName;
     socket.join(roomCode);
+    if (!roomExists(roomCode)) {
+      createRoom(roomCode);
+    }
+    addUser(roomCode, clientName, socket.id);
   });
 
-  socket.on("get room users", (data) => {
-    const { roomCode } = data;
-    // const clients = io.sockets.clients(roomCode);
-    // clients.forEach(function (client) {
-    //   console.log("Username: " + client.nickname);
-    // });
+  //getting room users
+  socket.on("get room users", ({ roomCode }) => {
+    const clients = getAllUsers(roomCode);
+    socket.emit("room status", { clients });
   });
 
+  //user leaves
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
