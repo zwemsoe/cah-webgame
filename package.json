@@ -1,0 +1,25 @@
+{
+  "name": "cah-webgame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "client": "npm run start --prefix client",
+    "server": "npm run start --prefix server",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zwemsoe/cah-webgame.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zwemsoe/cah-webgame/issues"
+  },
+  "homepage": "https://github.com/zwemsoe/cah-webgame#readme",
+  "dependencies": {
+    "concurrently": "^5.3.0"
+  }
+}

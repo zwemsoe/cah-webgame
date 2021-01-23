@@ -1,32 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Navbar } from "../components/Navbar";
-import ioClient from "socket.io-client";
 import { randomString } from "../utils";
+import { socket } from "../socketClient";
 
-const socket = ioClient("http://localhost:4001", {
-  withCredentials: true,
-});
-
-const Home = () => {
+export default function Home({ history }) {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
+  const [isLoading, setLoading] = useState(false);
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected");
-    });
-  });
+  useEffect(() => {});
 
   const handleJoin = () => {
+    setLoading(true);
+
     socket.emit("join room", {
       roomCode: code,
       clientName: name,
       clientId: randomString(8),
     });
+
+    setTimeout(() => {
+      history.push("/" + code);
+    }, 2000);
   };
 
+  if (isLoading) {
+    return (
+      <>
+        <h1>Loading...</h1>
+      </>
+    );
+  }
+
   return (
-    <div className='App'>
+    <>
       <Navbar />
       <div className='centered whole-screen'>
         <div>
@@ -64,8 +71,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-};
-
-export default Home;
+}
