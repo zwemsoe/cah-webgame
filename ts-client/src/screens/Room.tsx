@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { socket } from "../socketClient";
 
-export default function Room({ match }) {
+interface User {
+  id: string,
+  name: string,
+  roomId: string,
+}
+
+export default function Room({ match } : {match:any}) {
   const roomCode = match.params.roomId;
 
-  socket.on("room status", ({ clients }) => {
+  socket.on("room status", ({ clients } : {clients: User[]}) => {
     console.log(`Clients: `, clients);
   });
 

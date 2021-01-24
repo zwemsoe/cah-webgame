@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "../components/Navbar";
-import { randomString } from "../utils";
+//import { randomString } from "../utils";
 import { socket } from "../socketClient";
 
-export default function Home({ history }) {
+export default function Home({ history } : {history: any}) {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [isLoading, setLoading] = useState(false);
@@ -16,7 +16,6 @@ export default function Home({ history }) {
     socket.emit("join room", {
       roomCode: code,
       clientName: name,
-      clientId: randomString(8),
     });
 
     setTimeout(() => {
@@ -62,7 +61,7 @@ export default function Home({ history }) {
               <div className='somespace'></div>
               <button
                 type='button'
-                class='btn btn-secondary'
+                className='btn btn-secondary'
                 onClick={handleJoin}
               >
                 Join Room
