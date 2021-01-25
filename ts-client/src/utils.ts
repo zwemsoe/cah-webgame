@@ -1,6 +1,8 @@
-export {}
+import ioClient from "socket.io-client";
 
-const randomString = (len:number) => {
+export const socket = ioClient("http://localhost:5000", {});
+
+export const randomString = (len:number) => {
     let result = "";
     const characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
@@ -9,7 +11,4 @@ const randomString = (len:number) => {
     }
     return result;
   };
-  
-  module.exports = {
-    randomString
-  };
+

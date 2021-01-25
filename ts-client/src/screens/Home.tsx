@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "../components/Navbar";
-//import { randomString } from "../utils";
-import { socket } from "../socketClient";
+import { socket } from "../utils";
 
 export default function Home({ history } : {history: any}) {
   const [name, setName] = useState("");

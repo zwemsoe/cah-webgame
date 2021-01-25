@@ -35,7 +35,7 @@ io.on("connection", (socket:any) => {
   //getting room users
   socket.on("get room users", ({ roomCode }: {roomCode: string}) => {
     const clients = getAllUsers(roomCode);
-    socket.emit("room status", { clients });
+    io.to(roomCode).emit("room status", { clients });
   });
 
   //user leaves
