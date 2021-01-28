@@ -1,26 +1,42 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext} from "react";
 import { Navbar } from "../components/Navbar";
-import { socket } from "../utils";
+import { randomString } from "../utils";
+import {SocketContext} from "../contexts/SocketContext";
 
-export default function Home({ history } : {history: any}) {
+interface Props{
+  history: any,
+  saveToLocalStorage: any,
+}
+
+export default function Home({ history, saveToLocalStorage} : Props) {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [isLoading, setLoading] = useState(false);
-
+  const [randomCode, setRandomCode] = useState("");
+  const socket = useContext(SocketContext);
   useEffect(() => {});
 
   const handleJoin = () => {
+    saveToLocalStorage(code);
     setLoading(true);
 
-    socket.emit("join room", {
+    const clientId = randomString(8);
+    socket && socket.emit("join room", {
       roomCode: code,
       clientName: name,
+      clientId: clientId,
     });
 
     setTimeout(() => {
-      history.push("/" + code);
+      history.push("/" + code, {clientId});
     }, 2000);
   };
+
+  const handleCreateRoomCode = () => {
+    const new_code = randomString(8);
+    setRandomCode(new_code);
+    setCode(new_code);
+  }
 
   if (isLoading) {
     return (
@@ -52,6 +68,7 @@ export default function Home({ history } : {history: any}) {
                 type='text'
                 name='room-name'
                 placeholder='Room Code'
+                value={randomCode}
                 onChange={(e) => {
                   setCode(e.target.value);
                 }}
@@ -60,10 +77,17 @@ export default function Home({ history } : {history: any}) {
               <div className='somespace'></div>
               <button
                 type='button'
-                className='btn btn-secondary'
+                className='btn btn-warning'
                 onClick={handleJoin}
               >
                 Join Room
+              </button>
+              <button
+                type='button'
+                className='btn btn-secondary'
+                onClick={handleCreateRoomCode}
+              >
+                Create a Room Code
               </button>
             </div>
           </div>

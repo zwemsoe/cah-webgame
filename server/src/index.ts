@@ -20,21 +20,23 @@ app.get('/', (req: Request, res: Response) => {
 io.on("connection", (socket:any) => {
   console.log("a user connected");
 
+
   //joining a room
-  socket.on("join room", ({ roomCode, clientName }: {roomCode: string, clientName: string}) => {
+  socket.on("join room", ({ roomCode, clientName, clientId }: {roomCode: string, clientName: string, clientId: string}) => {
     console.log(
-      "Room Code: " + roomCode + ", Name: " + clientName + ", Id: " + socket.id
+      "Room Code: " + roomCode + ", Name: " + clientName + ", Id: " + clientId
     );
     socket.join(roomCode);
     if (!roomExists(roomCode)) {
       createRoom(roomCode);
     }
-    addUser(roomCode, clientName, socket.id);
+    addUser(roomCode, clientName, clientId);
   });
 
   //getting room users
   socket.on("get room users", ({ roomCode }: {roomCode: string}) => {
     const clients = getAllUsers(roomCode);
+    console.log("Clients", clients);
     io.to(roomCode).emit("room status", { clients });
   });
 
