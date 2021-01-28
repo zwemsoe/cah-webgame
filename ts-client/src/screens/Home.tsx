@@ -1,23 +1,22 @@
-import { useState, useEffect, useContext} from "react";
+import { useState, useEffect, useContext, useRef} from "react";
 import { Navbar } from "../components/Navbar";
 import { randomString } from "../utils";
 import {SocketContext} from "../contexts/SocketContext";
 
 interface Props{
   history: any,
-  saveToLocalStorage: any,
 }
 
-export default function Home({ history, saveToLocalStorage} : Props) {
+export default function Home({ history } : Props) {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [randomCode, setRandomCode] = useState("");
+  const codeInputRef = useRef<HTMLInputElement | null>(null);
   const socket = useContext(SocketContext);
   useEffect(() => {});
 
   const handleJoin = () => {
-    saveToLocalStorage(code);
     setLoading(true);
 
     const clientId = randomString(8);
@@ -36,6 +35,8 @@ export default function Home({ history, saveToLocalStorage} : Props) {
     const new_code = randomString(8);
     setRandomCode(new_code);
     setCode(new_code);
+    //@ts-ignore
+    codeInputRef.current.value = new_code;
   }
 
   if (isLoading) {
@@ -68,7 +69,7 @@ export default function Home({ history, saveToLocalStorage} : Props) {
                 type='text'
                 name='room-name'
                 placeholder='Room Code'
-                value={randomCode}
+                ref = {codeInputRef}
                 onChange={(e) => {
                   setCode(e.target.value);
                 }}

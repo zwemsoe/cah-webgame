@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { randomString } from "../utils";
 import {SocketContext} from "../contexts/SocketContext";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 interface User {
   id: string,
@@ -9,34 +10,35 @@ interface User {
 }
 
 interface Props {
-  match: any,
   history: any,
-  roomCode: string,
+  match: any,
 }
 
-export default function Room({ match, history, roomCode } : Props) {
-  const [players, setPlayers] = useState<User[]>([]);
-  const [lastPlayer, setLastPlayer] = useState<number | null>(null);
-  const [hostPlayer, setHostPlayer] = useState<User | null>(null);
-  const [currentPlayer, setCurrentPlayer] = useState<User | undefined>(undefined);
+export default function Room({ match, history } : Props) {
+  const roomCode = match.params.roomId;
+  const [players, setPlayers] = useLocalStorage(`room-players-${roomCode}`, []);
+  const [hostPlayer, setHostPlayer] = useLocalStorage(`host-player-${roomCode}`, undefined);
+  const [currentPlayer, setCurrentPlayer] = useLocalStorage(`current-player-${roomCode}`, undefined);;
+  const [lastJoined, setLastJoined] = useState<number | null>(null);
   const socket = useContext(SocketContext);
   
 
   useEffect(() => {
     console.log("This runs again after reload")
-    console.log("Scoekt", socket)
+    console.log("Socket", socket)
     socket && socket.emit("get room users", {
       roomCode: roomCode,
-    }); 
+    });
   }, []);
 
   useEffect(() => {
-    console.log("Scoekt", socket)
+    console.log("Socket", socket)
+    console.log("Players", players)
     socket && socket.on("room status", ({ clients } : {clients: User[]}) => {
       console.log(`Clients: `, clients);
       setPlayers(clients);
       if(clients.length !== 0){
-        setLastPlayer(clients.length-1);
+        setLastJoined(clients.length-1);
         setHostPlayer(clients[0]);
         var id: string | undefined = history.location.state.clientId;
         setCurrentPlayer(clients.find((client) => client.id === id));
@@ -60,14 +62,12 @@ export default function Room({ match, history, roomCode } : Props) {
     }
   }
 
-  console.log("Players:", players);
-  console.log("RoomCode:", roomCode);
 
   return (
     <>
-      <h1>{lastPlayer !== null && players[lastPlayer].name + " joined." }</h1>
+      <h1>{lastJoined !== null && players[lastJoined].name + " joined." }</h1>
       <h1>Players List:</h1>
-      { players.map((player, i) => {
+      { players.map((player:any, i:number) => {
         return <h2 key={i}>{player.name}</h2>
       })}
 

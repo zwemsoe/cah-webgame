@@ -37,7 +37,7 @@ io.on("connection", (socket:any) => {
   socket.on("get room users", ({ roomCode }: {roomCode: string}) => {
     const clients = getAllUsers(roomCode);
     console.log("Clients", clients);
-    io.to(roomCode).emit("room status", { clients });
+    io.in(roomCode).emit("room status", { clients });
   });
 
   //user leaves

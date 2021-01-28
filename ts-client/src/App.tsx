@@ -1,31 +1,24 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import useLocalStorage from "./hooks/useLocalStorage";
 import Home from "./screens/Home";
 import Room from "./screens/Room";
-import ioClient from "socket.io-client";
-import {SocketContext} from './contexts/SocketContext';
-
-const socket = ioClient("http://localhost:5000", {});
+import {SocketContext, socket} from './contexts/SocketContext';
 
 const App = () => {
-  const [roomId, setRoomId] = useLocalStorage('roomId', '');
-  //const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
 
-  // useEffect(() => {
-    
-  //   setSocket(newSocket);
-  //   return () => {
-  //     newSocket.close();
-  //   };
-  // }, [roomId]);
+  useEffect(() => {
+    return () => {
+      console.log("unmounting");
+      socket.close();
+    };
+  }, []);
 
   return (
     <BrowserRouter>
       <Switch> 
       <SocketContext.Provider value={socket}>
-        <Route path='/' exact render={(props) => <Home saveToLocalStorage={setRoomId} {...props}/>} />
-        <Route path='/:roomId' exact render={(props) => <Room roomCode={roomId} {...props}/>} />
+        <Route path='/' exact render={(props) => <Home {...props}/>} />
+        <Route path='/:roomId' exact render={(props) => <Room {...props}/>} />
         </SocketContext.Provider>
     </Switch>
     </BrowserRouter>
