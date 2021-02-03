@@ -19,7 +19,7 @@ export default function Home({ history } : Props) {
   const handleJoin = () => {
     setLoading(true);
 
-    const clientId = randomString(8);
+    const clientId = randomString(16);
     socket && socket.emit("join room", {
       roomCode: code,
       clientName: name,
@@ -32,7 +32,7 @@ export default function Home({ history } : Props) {
   };
 
   const handleCreateRoomCode = () => {
-    const new_code = randomString(8);
+    const new_code = randomString(10);
     setRandomCode(new_code);
     setCode(new_code);
     //@ts-ignore

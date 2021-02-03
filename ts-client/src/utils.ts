@@ -1,5 +1,4 @@
 
-
 export const randomString = (len:number) => {
     let result = "";
     const characters =
@@ -8,5 +7,10 @@ export const randomString = (len:number) => {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return result;
-  };
+};
+
+export const fetchFromLocalStorage = (key: string) => {
+  const jsonValue = localStorage.getItem('cah-webgame-' + key);
+  if (jsonValue !== null) return JSON.parse(jsonValue);
+}
 

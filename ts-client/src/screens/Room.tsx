@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import { randomString } from "../utils";
 import {SocketContext} from "../contexts/SocketContext";
 import useLocalStorage from "../hooks/useLocalStorage";
-
-interface User {
-  id: string,
-  name: string,
-  roomId: string,
-}
+import {User} from "../interfaces";
 
 interface Props {
   history: any,
@@ -18,7 +12,7 @@ export default function Room({ match, history } : Props) {
   const roomCode = match.params.roomId;
   const [players, setPlayers] = useLocalStorage(`room-players-${roomCode}`, []);
   const [hostPlayer, setHostPlayer] = useLocalStorage(`host-player-${roomCode}`, undefined);
-  const [currentPlayer, setCurrentPlayer] = useLocalStorage(`current-player-${roomCode}`, undefined);;
+  const [currentPlayer, setCurrentPlayer] = useLocalStorage(`current-player-${history.location.state.clientId}`, undefined);;
   const [lastJoined, setLastJoined] = useState<number | null>(null);
   const socket = useContext(SocketContext);
   
@@ -67,9 +61,11 @@ export default function Room({ match, history } : Props) {
     <>
       <h1>{lastJoined !== null && players[lastJoined].name + " joined." }</h1>
       <h1>Players List:</h1>
-      { players.map((player:any, i:number) => {
-        return <h2 key={i}>{player.name}</h2>
-      })}
+      <ul>
+        { players.map((player:any, i:number) => {
+          return <li key={i}>{player.name} {(hostPlayer && hostPlayer.id) === player.id && "(Host)"}</li>
+        })}
+      </ul>
 
       <div className='somespace'></div>
       <div className='somespace'></div>
