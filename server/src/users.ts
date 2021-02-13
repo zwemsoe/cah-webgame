@@ -1,16 +1,6 @@
 export {};
 
-interface User {
-    id: string,
-    name: string,
-    roomId: string,
-}
-
-interface Room {
-    id: string,
-    users: User[],
-}
-
+import {User, Room} from './interfaces';
 
 let rooms:Room[] = [];
 
@@ -28,7 +18,7 @@ const addUser = (roomId:string, clientName:string, clientId:string) => {
   
 };
 
-function createRoom(roomId:string):void {
+const createRoom = (roomId:string ) => {
   const room:Room = {
     id: roomId,
     users: [],
@@ -48,9 +38,33 @@ const getAllUsers = (roomId:string) => {
   }
 };
 
+const testUsers: User[] = [
+  {
+      id: "1",
+      name: "John",
+      roomId: "abc",
+  },
+  {
+      id: "2",
+      name: "John2",
+      roomId: "abc",
+  },
+  {
+      id: "3",
+      name: "John3",
+      roomId: "abc",
+  },
+  {
+      id: "4",
+      name: "John4",
+      roomId: "abc",
+  }
+];
+
 module.exports = {
   addUser,
   createRoom,
   roomExists,
   getAllUsers,
+  testUsers,
 };

@@ -1,6 +1,10 @@
 import express, { Response, Request} from 'express';
 import cors from 'cors';
-const { addUser, createRoom, roomExists, getAllUsers } = require('./users');
+const { addUser, createRoom, roomExists, getAllUsers, testUsers } = require('./users');
+import {User} from './interfaces';
+import { Player } from "./player";
+import { Game } from "./game";
+
 const app = express();
 const server = require("http").createServer(app);
 
@@ -45,6 +49,9 @@ io.on("connection", (socket:any) => {
     console.log("User disconnected");
   });
 });
+
+//testing
+new Game(testUsers);
 
 const port = process.env.PORT || 5000;
 
