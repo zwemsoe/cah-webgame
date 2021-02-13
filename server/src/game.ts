@@ -5,8 +5,8 @@ import axios from 'axios';
 
 class Game {
     players: Player[] = [];
-    private white_cards: WhiteCard[] = [];
-    private black_cards: BlackCard[] = [];
+    white_cards: WhiteCard[] = [];
+    black_cards: BlackCard[] = [];
     played_cards: WhiteCard[] = [];
     current_black_card: BlackCard | null = null; 
     judge_index = 0;
