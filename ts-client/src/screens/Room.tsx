@@ -131,7 +131,11 @@ export default function Room({ match, history }: Props) {
               <option value="120">120s</option>
             </select>
             <br />
-            <button className="bg-yellow-500 hover:bg-yellow-300 text-black font-bold h-10 w-28 rounded">
+            <button className="bg-yellow-500 hover:bg-yellow-300 text-black font-bold h-10 w-28 rounded"
+              onClick= {() => {
+                
+              }}
+            >
               Start Game
             </button>
           </div>
