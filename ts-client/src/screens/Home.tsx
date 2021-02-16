@@ -25,19 +25,24 @@ export default function Home({ history, setClientName, match }: Props) {
   }, []);
 
   const handleJoin = () => {
-    setLoading(true);
+    if(name){
+      setLoading(true);
 
-    const clientId = uuid();
-    socket.emit("join room", {
-      roomCode: code,
-      clientName: name,
-      clientId: clientId,
-    });
+      const clientId = uuid();
+      socket.emit("join room", {
+        roomCode: code,
+        clientName: name,
+        clientId: clientId,
+      });
 
-    setTimeout(() => {
-      history.push("/" + code, { clientId });
-      setClientName(name);
-    }, 2000);
+      setTimeout(() => {
+        history.push("/" + code, { clientId });
+        setClientName(name);
+      }, 2000);
+    } else {
+      alert("Please fill in your name.")
+    }
+    
   };
 
 
@@ -63,7 +68,7 @@ export default function Home({ history, setClientName, match }: Props) {
                 setName(e.target.value);
               }}
             />
-            <div className="grid grid-flow-col grid-cols-2 mt-3 gap-2">
+            <div className="grid grid-flow-col mt-3">
               <button
                 className="bg-yellow-500 hover:bg-yellow-300 text-black font-bold h-10 rounded-full"
                 onClick={handleJoin}

@@ -1,6 +1,7 @@
-import { settings } from "cluster";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
+import Lobby from "../components/Lobby";
 import { SocketContext } from "../contexts/SocketContext";
+import GameRoom from "../game/ui/GameRoom";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { User, Setting } from "../interfaces";
 
@@ -13,7 +14,7 @@ var defaultSetting: Setting = {
   rounds: 3,
   judgeTime: 60,
   pickTime: 60,
-}
+};
 
 export default function Room({ match, history }: Props) {
   const roomCode = match.params.roomId;
@@ -27,6 +28,7 @@ export default function Room({ match, history }: Props) {
     undefined
   );
   const [lastJoined, setLastJoined] = useState<number | null>(null);
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [setting, changeSetting] = useState<Setting>(defaultSetting);
   const settingRef = useRef(defaultSetting);
   settingRef.current = setting;
@@ -61,6 +63,13 @@ export default function Room({ match, history }: Props) {
         }
       }
     });
+    socket.on("game start update", () => {
+      if (hostPlayer && currentPlayer) {
+        if (hostPlayer.id !== currentPlayer.id) {
+          setGameStarted(true);
+        }
+      }
+    });
   });
 
   const handleSetting = (e: any) => {
@@ -71,120 +80,34 @@ export default function Room({ match, history }: Props) {
       [name]: parse_value,
     }));
     setTimeout(() => {
-      socket.emit("change setting", { settings: settingRef.current, roomCode: roomCode });
-    }, 500)
-  }
+      socket.emit("change setting", {
+        settings: settingRef.current,
+        roomCode: roomCode,
+      });
+    }, 500);
+  };
 
-
-  const renderSettings = () => {
-    if (hostPlayer && currentPlayer) {
-      if (hostPlayer.id === currentPlayer.id) {
-        return (
-          <div>
-            <label htmlFor="rounds-select" className="mr-5">
-              Number of Rounds:
-            </label>
-            <select
-              className="w-auto border bg-white rounded px-3 py-2 outline-none"
-              name="rounds"
-              value={setting.rounds}
-              onChange={handleSetting}
-            >
-              <option value="3">
-                3
-              </option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-            <br />
-
-            <label htmlFor="judge-select" className="mr-5">
-              Judge Time:
-            </label>
-            <select
-              className="w-auto border bg-white rounded px-3 py-2 outline-none"
-              name="judgeTime"
-              value={setting.judgeTime}
-              onChange={handleSetting}
-            >
-              <option value="60">
-                60s
-              </option>
-              <option value="90">90s</option>
-              <option value="120">120s</option>
-            </select>
-            <br />
-
-            <label htmlFor="pick-select" className="mr-5">
-              Pick Time:
-            </label>
-            <select
-              className="w-auto border bg-white rounded px-3 py-2 outline-none mb-2"
-              name="pickTime"
-              value={setting.pickTime}
-              onChange={handleSetting}
-            >
-              <option value="60">
-                60s
-              </option>
-              <option value="90">90s</option>
-              <option value="120">120s</option>
-            </select>
-            <br />
-            <button className="bg-yellow-500 hover:bg-yellow-300 text-black font-bold h-10 w-28 rounded"
-              onClick= {() => {
-                
-              }}
-            >
-              Start Game
-            </button>
-          </div>
-        );
-      } else {
-        return (
-          <div>
-            <label htmlFor="rounds-select" className="mr-5">
-              Number of Rounds:
-            </label>
-            <p>{setting.rounds}</p>
-            <br />
-
-            <label htmlFor="judge-select" className="mr-5">
-              Judge Time:
-            </label>
-            <p>{setting.judgeTime}s</p>
-            <br />
-
-            <label htmlFor="pick-select" className="mr-5">
-              Pick Time:
-            </label>
-            <p>{setting.pickTime}s</p>
-            <br />
-          </div>
-        );
-      }
-    }
+  const handleStartGame = () => {
+    setGameStarted(true);
+    socket.emit("start game", { roomCode: roomCode });
   };
 
   return (
     <>
-      <p className="font-extrabold">
-        {lastJoined !== null && players[lastJoined].name + " joined."}
-      </p>
-      <p className="font-bold">Players List:</p>
-      <ul className="mb-5">
-        {players.map((player: any, i: number) => {
-          return (
-            <li key={i}>
-              - {player.name}{" "}
-              {(hostPlayer && hostPlayer.id) === player.id && "(Host)"}
-            </li>
-          );
-        })}
-      </ul>
-
-      <p className="font-bold">Settings</p>
-      {renderSettings()}
+      {gameStarted ? (
+        <GameRoom />
+      ) : (
+        <Lobby
+          setting={setting}
+          handleSetting={handleSetting}
+          players={players}
+          hostPlayer={hostPlayer}
+          currentPlayer={currentPlayer}
+          lastJoined={lastJoined}
+          handleStartGame={handleStartGame}
+          match = {match}
+        />
+      )}
     </>
   );
 }
