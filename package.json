@@ -21,5 +21,8 @@
   "homepage": "https://github.com/zwemsoe/cah-webgame#readme",
   "dependencies": {
     "concurrently": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.0"
   }
 }
