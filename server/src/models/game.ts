@@ -1,5 +1,5 @@
-import { randomString } from './utils';
-import {User, WhiteCard, BlackCard} from './interfaces';
+import { randomString } from '../utils';
+import {User, WhiteCard, BlackCard} from '../interfaces';
 import { Player } from "./player";
 import axios from 'axios';
 

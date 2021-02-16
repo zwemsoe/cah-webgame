@@ -7,6 +7,13 @@ export interface User {
 export interface Room {
     id: string,
     users: User[],
+    settings: Setting,
+}
+
+export interface Setting {
+    rounds: number,
+    judgeTime: number,
+    pickTime: number,
 }
 
 export interface WhiteCard{

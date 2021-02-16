@@ -1,6 +1,6 @@
 export {};
 
-import {User, Room} from './interfaces';
+import {User, Room, Setting} from './interfaces';
 
 let rooms:Room[] = [];
 
@@ -14,7 +14,7 @@ const addUser = (roomId:string, clientName:string, clientId:string) => {
       roomId: roomId,
     };
     users.push(user);
-  }
+  };
   
 };
 
@@ -22,6 +22,11 @@ const createRoom = (roomId:string ) => {
   const room:Room = {
     id: roomId,
     users: [],
+    settings: {
+      rounds: 3,
+      judgeTime: 60,
+      pickTime: 60,
+    }
   };
   rooms.push(room);
 };
@@ -37,6 +42,20 @@ const getAllUsers = (roomId:string) => {
     return room_users;
   }
 };
+
+const changeRoomSettings = (settings: Setting, roomCode: string) => {
+  const room = roomExists(roomCode);
+  if (room){
+    room.settings = settings;
+  } 
+}
+
+const getRoomSettings = (roomCode: string) => {
+  const room = roomExists(roomCode);
+  if (room) {
+    return room.settings;
+  }
+}
 
 const testUsers: User[] = [
   {
@@ -67,4 +86,6 @@ module.exports = {
   roomExists,
   getAllUsers,
   testUsers,
+  changeRoomSettings,
+  getRoomSettings
 };

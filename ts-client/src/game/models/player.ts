@@ -1,4 +1,4 @@
-import {User, WhiteCard, BlackCard} from './interfaces';
+import {User, WhiteCard, BlackCard} from '../../interfaces';
 
 class Player {
     name = "";
