@@ -3,7 +3,7 @@ import Lobby from "../components/Lobby";
 import { SocketContext } from "../contexts/SocketContext";
 import GameRoom from "../game/ui/GameRoom";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { User, Setting, Player } from "../interfaces";
+import { User, Setting, Player, BlackCard } from "../interfaces";
 
 interface Props {
   history: any;
@@ -33,6 +33,7 @@ export default function Room({ match, history }: Props) {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player>();
+  const [currentBlackCard, setCurrentBlackCard] = useState<BlackCard | null> (null);
 
   const settingRef = useRef(defaultSetting);
   settingRef.current = setting;
@@ -67,13 +68,13 @@ export default function Room({ match, history }: Props) {
         }
       }
     });
-    socket.on("game start update", ({ players }: { players: Player[] }) => {
+    socket.on("game start update", ({ players, blackCard }: { players: Player[], blackCard: BlackCard }) => {
       setGameStarted(true);
       setPlayers(players);
-      console.log("players: ", players);
       const player = extractCurrentPlayer(players);
-      console.log("currentPlayer: ", player);
       setCurrentPlayer(player);
+      setCurrentBlackCard(blackCard);
+      console.log("black card: ", blackCard);
     });
   });
 
@@ -107,10 +108,16 @@ export default function Room({ match, history }: Props) {
     socket.emit("start game", { roomCode: roomCode });
   };
 
+  console.log("Current Black Card: ", currentBlackCard);
+
   return (
     <>
       {gameStarted ? (
-        <GameRoom players={players} currentPlayer={currentPlayer} />
+        <GameRoom 
+          players={players} 
+          currentPlayer={currentPlayer} 
+          currentBlackCard = {currentBlackCard} 
+        />
       ) : (
         <Lobby
           setting={setting}

@@ -16,6 +16,7 @@ module.exports = (socket: any, io: any) => {
         room.game = new Game(room.users);
         await room.game.init();
         const players = room.game.getAllPlayers();
-        io.in(roomCode).emit("game start update", {players});
+        const blackCard = room.game.current_black_card;
+        io.in(roomCode).emit("game start update", {players, blackCard});
     });
 }

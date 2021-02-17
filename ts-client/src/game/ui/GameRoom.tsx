@@ -1,10 +1,11 @@
 import ScoreBoard from "./ScoreBoard";
-import { User, Player, WhiteCard } from "../../interfaces";
+import { User, Player, WhiteCard, BlackCard } from "../../interfaces";
 import Card from "./Card";
 
 interface Props {
     players: Player[],
     currentPlayer: Player | undefined,
+    currentBlackCard: BlackCard | null,
 }
 
 
@@ -18,7 +19,10 @@ export default function GameRoom(props: Props){
                     props.currentPlayer.cards.map((card: WhiteCard, i: any) => {
                         return (
                             <div key={i}>
-                                <Card type="white" content = {card.content}/>
+                                <Card 
+                                type="white" 
+                                card = {card} 
+                                />
                             </div>
                         )
                     })
@@ -26,10 +30,25 @@ export default function GameRoom(props: Props){
             </div>
         )
     }
+
+    const renderCurrentBlackCard = () => {
+        return (
+            <div>
+                {props.currentBlackCard && 
+                <Card 
+                    type="black" 
+                    card = {props.currentBlackCard} 
+                />}
+                
+            </div>
+        )
+    }
+
     return (
         <>
             <p>Game Room</p>
             <ScoreBoard players={props.players}/>
+            {renderCurrentBlackCard()}
             {props.currentPlayer && renderWhiteCards()}
         </>
     )
