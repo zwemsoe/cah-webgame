@@ -36,5 +36,4 @@ export interface WhiteCard{
 export interface BlackCard{
     content: string,
     draw: number,
-    pick: number,
 }

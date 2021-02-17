@@ -3,7 +3,7 @@ import Lobby from "../components/Lobby";
 import { SocketContext } from "../contexts/SocketContext";
 import GameRoom from "../game/ui/GameRoom";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { User, Setting, Player, BlackCard } from "../interfaces";
+import { User, Setting, Player, BlackCard, WhiteCard } from "../interfaces";
 
 interface Props {
   history: any;
@@ -30,13 +30,11 @@ export default function Room({ match, history }: Props) {
   const [lastJoined, setLastJoined] = useState<number | null>(null);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [setting, changeSetting] = useState<Setting>(defaultSetting);
-
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [currentPlayer, setCurrentPlayer] = useState<Player>();
-  const [currentBlackCard, setCurrentBlackCard] = useState<BlackCard | null> (null);
-
   const settingRef = useRef(defaultSetting);
   settingRef.current = setting;
+  
+  //GameRoom related
+
 
   const socket = useContext(SocketContext);
 
@@ -68,25 +66,10 @@ export default function Room({ match, history }: Props) {
         }
       }
     });
-    socket.on("game start update", ({ players, blackCard }: { players: Player[], blackCard: BlackCard }) => {
+    socket.on("game start update", () => {
       setGameStarted(true);
-      setPlayers(players);
-      const player = extractCurrentPlayer(players);
-      setCurrentPlayer(player);
-      setCurrentBlackCard(blackCard);
-      console.log("black card: ", blackCard);
     });
   });
-
-  const extractCurrentPlayer = (players: Player[]) => {
-    for (let i = 0; i < players.length; i++) {
-      if (currentUser) {
-        if (players[i].id === currentUser.id) {
-          return players[i];
-        }
-      }
-    }
-  };
 
   const handleSetting = (e: any) => {
     const { name, value } = e.target;
@@ -106,18 +89,14 @@ export default function Room({ match, history }: Props) {
   const handleStartGame = () => {
     setGameStarted(true);
     socket.emit("start game", { roomCode: roomCode });
+    socket.emit("game state init", { roomCode: roomCode });
   };
-
-  console.log("Current Black Card: ", currentBlackCard);
+  
 
   return (
     <>
       {gameStarted ? (
-        <GameRoom 
-          players={players} 
-          currentPlayer={currentPlayer} 
-          currentBlackCard = {currentBlackCard} 
-        />
+        <GameRoom currentUser = {currentUser} roomCode = {roomCode}/>
       ) : (
         <Lobby
           setting={setting}
