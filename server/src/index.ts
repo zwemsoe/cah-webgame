@@ -14,8 +14,6 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Index');
 });
 
-//testing
-new Game(testUsers);
 
 const port = process.env.PORT || 5000;
 

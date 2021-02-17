@@ -1,4 +1,3 @@
-import { Player } from "../models/player";
 import { Game } from "../models/game";
 const {
     addUser,
@@ -11,10 +10,11 @@ const {
 
 
 module.exports = (socket: any, io: any) => {
-    socket.on("start game", ({ roomCode } : { roomCode: string}) => {
+    socket.on("start game", async ({ roomCode } : { roomCode: string}) => {
         console.log("starting game");
         const room = roomExists(roomCode);
         room.game = new Game(room.users);
+        await room.game.init();
         const players = room.game.getAllPlayers();
         io.in(roomCode).emit("game start update", {players});
     });

@@ -3,7 +3,7 @@ import Lobby from "../components/Lobby";
 import { SocketContext } from "../contexts/SocketContext";
 import GameRoom from "../game/ui/GameRoom";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { User, Setting, Player} from "../interfaces";
+import { User, Setting, Player } from "../interfaces";
 
 interface Props {
   history: any;
@@ -32,8 +32,8 @@ export default function Room({ match, history }: Props) {
   const [setting, changeSetting] = useState<Setting>(defaultSetting);
 
   const [players, setPlayers] = useState<Player[]>([]);
-  
-  
+  const [currentPlayer, setCurrentPlayer] = useState<Player>();
+
   const settingRef = useRef(defaultSetting);
   settingRef.current = setting;
 
@@ -67,11 +67,25 @@ export default function Room({ match, history }: Props) {
         }
       }
     });
-    socket.on("game start update", ({players} : {players: Player[]}) => {
-        setGameStarted(true);
-        setPlayers(players);
+    socket.on("game start update", ({ players }: { players: Player[] }) => {
+      setGameStarted(true);
+      setPlayers(players);
+      console.log("players: ", players);
+      const player = extractCurrentPlayer(players);
+      console.log("currentPlayer: ", player);
+      setCurrentPlayer(player);
     });
   });
+
+  const extractCurrentPlayer = (players: Player[]) => {
+    for (let i = 0; i < players.length; i++) {
+      if (currentUser) {
+        if (players[i].id === currentUser.id) {
+          return players[i];
+        }
+      }
+    }
+  };
 
   const handleSetting = (e: any) => {
     const { name, value } = e.target;
@@ -96,7 +110,7 @@ export default function Room({ match, history }: Props) {
   return (
     <>
       {gameStarted ? (
-        <GameRoom players={players}/>
+        <GameRoom players={players} currentPlayer={currentPlayer} />
       ) : (
         <Lobby
           setting={setting}
@@ -106,7 +120,7 @@ export default function Room({ match, history }: Props) {
           currentPlayer={currentUser}
           lastJoined={lastJoined}
           handleStartGame={handleStartGame}
-          match = {match}
+          match={match}
         />
       )}
     </>

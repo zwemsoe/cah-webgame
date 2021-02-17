@@ -12,12 +12,14 @@ class Game {
     judge_index = 0;
     round = 0;
 
-    constructor(users: User[]) { 
+    constructor(users: User[]){ 
         this.assignPlayers(users);
-        this.populateCards().then(() => {
-            this.distributeCards();
-            this.drawBlackCard();
-        });
+    }
+
+    init = async () => {
+        await this.populateCards();
+        this.distributeCards();
+        this.drawBlackCard();
     }
 
     //Getters
