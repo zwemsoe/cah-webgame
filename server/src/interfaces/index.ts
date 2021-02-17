@@ -8,6 +8,7 @@ export interface Room {
     id: string,
     users: User[],
     settings: Setting,
+    game: any,
 }
 
 export interface Setting {

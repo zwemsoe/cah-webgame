@@ -113,12 +113,12 @@ export default function Lobby(props: Props) {
           );
         })}
       </ul>
-
+      
       <p className="font-bold">Settings</p>
       {renderSettings()}
-      <p>
+      <p className="mt-3">
         Share with your friends:{" "}
-        <span className="rounded-sm px-3 py-3 mt-3 bg-gray-100">
+        <span className="text-white rounded-sm px-3 py-3 mt-3 bg-black">
           {window.location.origin + props.match.url}
         </span>
       </p>

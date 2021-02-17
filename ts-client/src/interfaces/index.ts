@@ -15,6 +15,17 @@ export interface Setting {
     pickTime: number,
 }
 
+
+//Game
+export interface Player{
+    id: string,
+    name: string,
+    points: number,
+    isJudge: boolean,
+    judge_cards: BlackCard[],
+    cards: WhiteCard[],
+}
+
 export interface WhiteCard{
     content: string,
     draw: number,

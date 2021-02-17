@@ -1,8 +1,15 @@
+import ScoreBoard from "./ScoreBoard";
+import { User, Player } from "../../interfaces";
 
-export default function GameRoom(){
+interface Props {
+    players: Player[],
+}
+
+export default function GameRoom(props: Props){
     return (
         <>
-            <p>GAME ROOM</p>
+            <p>Game Room</p>
+            <ScoreBoard players={props.players}/>
         </>
     )
 }

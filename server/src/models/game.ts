@@ -32,6 +32,10 @@ class Game {
         return this.players.filter((p) => p.points === max_points);
     }
 
+    getAllPlayers = () => {
+        return this.players;
+    }
+
     private assignPlayers = (users: User[]) => {
         const random_judge = Math.floor(Math.random() * users.length);
         this.judge_index = random_judge;

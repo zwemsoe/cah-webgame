@@ -24,6 +24,7 @@ const createRoom = (roomId: string) => {
       judgeTime: 60,
       pickTime: 60,
     },
+    game: null,
   };
   rooms.push(room);
 };

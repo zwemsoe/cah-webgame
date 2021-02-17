@@ -6,7 +6,7 @@ class Player {
     isJudge = false;
     cards: WhiteCard[] = [];
     judge_cards: BlackCard[] = [];
-    points = 100;
+    points = 0;
 
     constructor(user: User){
         this.name = user.name;
