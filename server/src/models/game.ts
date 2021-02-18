@@ -11,6 +11,7 @@ class Game {
     current_black_card: BlackCard | null = null;
     judge_index = 0;
     round = 0;
+    next_clicks: string[] = [];
 
     constructor(users: User[]) {
         this.assignPlayers(users);
@@ -85,14 +86,16 @@ class Game {
     }
 
     drawBlackCard = () => {
-        while (!this.current_black_card) {
+        let chosen = null;
+        while (!chosen) {
             const index = Math.floor(Math.random() * this.black_cards.length);
             const card = this.black_cards[index];
             if (card.draw === 1) {
                 card.draw--;
-                this.current_black_card = card;
+                chosen = card;
             }
         }
+        this.current_black_card = chosen;
     }
 
     playCard = (id: string, playerId: string) => {
@@ -130,6 +133,13 @@ class Game {
         const player = card && card.cardOwner && this.getPlayerById(card.cardOwner);
         player && player.addPoints(100);
         return card;
+    }
+
+    addNextClick = (playerId: string) => {
+        const exists = this.next_clicks.find((item) => item === playerId);
+        if (!exists) {
+            this.next_clicks.push(playerId);
+        }
     }
 }
 

@@ -4,7 +4,6 @@ import { useState, useContext, useEffect } from "react";
 import Whitecard from "./Whitecard";
 import Blackcard from "./Blackcard";
 import WinnerCard from "./WinnerCard";
-import Timer from "./Timer";
 import { SocketContext } from "../../contexts/SocketContext";
 
 interface Props {
@@ -13,15 +12,20 @@ interface Props {
 }
 
 export default function GameRoom(props: Props) {
-  const [pickTimer, setPickTimer] = useState(true);
-  const [judgeTimer, setJudgeTimer] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player>();
-  const [currentBlackCard, setCurrentBlackCard] = useState<BlackCard | null>(null);
+  const [currentBlackCard, setCurrentBlackCard] = useState<BlackCard | null>(
+    null
+  );
   const [currentWhiteCard, setWhiteCard] = useState<WhiteCard>();
   const [judgeWhiteCard, setJudgeWhiteCard] = useState<WhiteCard>();
   const [winnerCard, setWinnerCard] = useState<WhiteCard>();
   const [playedCards, setPlayedCards] = useState<WhiteCard[]>([]);
+  const [judgeMode, setJudgeMode] = useState(false);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [nextClicked, setNextClicked] = useState(false);
+  const [hideNext, setHideNext] = useState(true);
+  const [hideSubmit, setHideSubmit] = useState(false);
 
   const socket = useContext(SocketContext);
 
@@ -37,14 +41,59 @@ export default function GameRoom(props: Props) {
       }
     );
 
-    socket.on("game state update", ({ players, playedCards, winnerCard, blackCard }: { players: Player[], playedCards: WhiteCard[], winnerCard: WhiteCard, blackCard: BlackCard }) => {
-      setPlayers(players);
-      const player = extractCurrentPlayer(players);
-      setCurrentPlayer(player);
-      setPlayedCards(playedCards);
-      setWinnerCard(winnerCard);
-      setCurrentBlackCard(blackCard);
-    });
+    socket.on(
+      "game state update player",
+      ({
+        players,
+        playedCards,
+      }: {
+        players: Player[];
+        playedCards: WhiteCard[];
+      }) => {
+        setPlayers(players);
+        const player = extractCurrentPlayer(players);
+        setCurrentPlayer(player);
+        setPlayedCards(playedCards);
+        setJudgeMode(true);
+        setSubmitClicked(false);
+        setHideSubmit(true);
+      }
+    );
+    socket.on(
+      "game state update judge",
+      ({
+        players,
+        winnerCard,
+      }: {
+        players: Player[];
+        winnerCard: WhiteCard;
+      }) => {
+        setPlayers(players);
+        const player = extractCurrentPlayer(players);
+        setCurrentPlayer(player);
+        setWinnerCard(winnerCard);
+        setJudgeMode(false);
+        setSubmitClicked(false);
+        setHideNext(false);
+      }
+    );
+
+    socket.on(
+      "next turn client",
+      ({ players, blackCard }: { players: Player[]; blackCard: BlackCard }) => {
+        setPlayers(players);
+        const player = extractCurrentPlayer(players);
+        setCurrentPlayer(player);
+        setCurrentBlackCard(blackCard);
+        setPlayedCards([]);
+        setWinnerCard(undefined);
+        setJudgeMode(false);
+        setSubmitClicked(false);
+        setNextClicked(false);
+        setHideSubmit(false);
+        setHideNext(true);
+      }
+    );
   });
 
   const extractCurrentPlayer = (players: Player[]) => {
@@ -60,37 +109,14 @@ export default function GameRoom(props: Props) {
   };
 
   const handleJudgeSelect = (card: WhiteCard) => {
-    setJudgeWhiteCard(card)
-  }
-
-  const handlePlayerTimesUp = () => {
-    setPickTimer(!pickTimer);
-    if(!currentPlayer?.isJudge){
-        socket.emit("card select by player", {
-        cardId: currentWhiteCard?.id,
-        playerId: currentPlayer?.id,
-        roomCode: props.roomCode,
-        });
-    } 
-    setJudgeTimer(!judgeTimer);
-  };
-
-  const handleJudgeTimesUp = () => {
-    setJudgeTimer(!judgeTimer);
-    if(currentPlayer?.isJudge){
-        socket.emit("card select by judge", {
-            cardId: judgeWhiteCard?.id,
-            playerId: currentPlayer?.id,
-            roomCode: props.roomCode,
-        });
-    } 
-    setPickTimer(!pickTimer);
+    setJudgeWhiteCard(card);
   };
 
   const renderWhiteCards = () => {
     return (
       <div>
-          <p>Your cards: </p>
+        {!currentPlayer?.isJudge && !hideSubmit && renderSubmitButton()}
+        <p>Your cards: </p>
         {currentPlayer &&
           currentPlayer.cards.map((card: WhiteCard, i: any) => {
             return (
@@ -100,7 +126,7 @@ export default function GameRoom(props: Props) {
                   card={card}
                   handlePlayerSelect={handlePlayerSelect}
                   currentWhiteCard={currentWhiteCard}
-                  currentPlayer = {currentPlayer}
+                  currentPlayer={currentPlayer}
                 />
               </div>
             );
@@ -112,43 +138,125 @@ export default function GameRoom(props: Props) {
   const renderCurrentBlackCard = () => {
     return (
       <div>
-          <p>Black card: </p>
+        <p>Black card: </p>
         {currentBlackCard && <Blackcard card={currentBlackCard} />}
-        {winnerCard && <WinnerCard card = {winnerCard} />}
+        {winnerCard && <Whitecard card={winnerCard} disabled={true} />}
       </div>
     );
   };
 
   const renderCardsReceived = () => {
-      return (
-        <div>
-          <p>Cards received (Judge Mode) : </p>
-            {playedCards.map((card: WhiteCard, i: any) => {
-                return (
-                    <div key={i}>
-                        <Whitecard
-                            type="white-judge"
-                            card={card}
-                            handleJudgeSelect={handleJudgeSelect}
-                            judgeWhiteCard={judgeWhiteCard}
-                            currentPlayer = {currentPlayer}
-                        />
-                    </div>
-                );
-            })}
+    return (
+      <div>
+        {renderSubmitButton()}
+        <p>Cards received (Judge Mode) : </p>
+        {playedCards.map((card: WhiteCard, i: any) => {
+          return (
+            <div key={i}>
+              <Whitecard
+                type="white-judge"
+                card={card}
+                handleJudgeSelect={handleJudgeSelect}
+                judgeWhiteCard={judgeWhiteCard}
+                currentPlayer={currentPlayer}
+              />
+            </div>
+          );
+        })}
       </div>
-      );
-  }
+    );
+  };
+
+  const renderCardsPlayed = () => {
+    return (
+      <div>
+        <p>Cards played : </p>
+        {playedCards.map((card: WhiteCard, i: any) => {
+          return (
+            <div key={i}>
+              <Whitecard card={card} disabled={true} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const handleSubmit = () => {
+    if (judgeMode) {
+      if (judgeWhiteCard) {
+        socket.emit("card select by judge", {
+          cardId: judgeWhiteCard?.id,
+          playerId: currentPlayer?.id,
+          roomCode: props.roomCode,
+        });
+        setSubmitClicked(true);
+      }
+    } else {
+      if (currentWhiteCard) {
+        socket.emit("card select by player", {
+          cardId: currentWhiteCard?.id,
+          playerId: currentPlayer?.id,
+          roomCode: props.roomCode,
+        });
+        setSubmitClicked(true);
+      }
+    }
+  };
+
+  const renderSubmitButton = () => {
+    return (
+      <div>
+        <button
+          className={`${
+            submitClicked ? "bg-green-500" : "bg-red-500"
+          } hover:bg-yellow-300 text-white h-10 w-28 `}
+          onClick={handleSubmit}
+        >
+          Submit
+        </button>
+      </div>
+    );
+  };
+
+  const handleNext = () => {
+    setNextClicked(true);
+    socket.emit("next turn", {
+      playerId: currentPlayer?.id,
+      roomCode: props.roomCode,
+    });
+  };
+
+  const renderNextButton = () => {
+    return (
+      <div>
+        <button
+          className={`${
+            nextClicked ? "bg-green-500" : "bg-yellow-500"
+          } hover:bg-red-300 text-white h-10 w-28 `}
+          onClick={handleNext}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
 
   return (
     <>
       <p>Game Room</p>
       <ScoreBoard players={players} />
-      {pickTimer && <Timer time={20} handleTimesUp={handlePlayerTimesUp} start={pickTimer} />}
-      {renderCurrentBlackCard()}
-      {currentPlayer && renderWhiteCards()}
-      {judgeTimer && <Timer time={20} handleTimesUp={handleJudgeTimesUp} start={judgeTimer} />}
-      {currentPlayer?.isJudge && renderCardsReceived()}
+      <div className="grid grid-cols-3 gap-10 mt-11">
+        <div>{currentPlayer && renderWhiteCards()}</div>
+        <div>
+          {!hideNext && renderNextButton()}
+          {renderCurrentBlackCard()}
+          {playedCards && renderCardsPlayed()}
+        </div>
+        <div>
+          {currentPlayer?.isJudge && judgeMode && renderCardsReceived()}
+        </div>
+      </div>
     </>
   );
 }
