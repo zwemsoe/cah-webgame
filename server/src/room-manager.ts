@@ -53,35 +53,12 @@ const getRoomSettings = (roomCode: string) => {
   }
 };
 
-const testUsers: User[] = [
-  {
-    id: "1",
-    name: "John",
-    roomId: "abc",
-  },
-  {
-    id: "2",
-    name: "John2",
-    roomId: "abc",
-  },
-  {
-    id: "3",
-    name: "John3",
-    roomId: "abc",
-  },
-  {
-    id: "4",
-    name: "John4",
-    roomId: "abc",
-  },
-];
 
 module.exports = {
   addUser,
   createRoom,
   roomExists,
   getAllUsers,
-  testUsers,
   changeRoomSettings,
   getRoomSettings,
 };

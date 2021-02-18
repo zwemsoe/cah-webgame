@@ -22,6 +22,8 @@ export interface Player {
     isJudge: boolean,
     judge_cards: BlackCard[],
     cards: WhiteCard[],
+    submitClicked: boolean;
+    nextClicked: boolean;
 }
 
 export interface WhiteCard {

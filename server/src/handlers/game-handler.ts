@@ -29,6 +29,8 @@ module.exports = (socket: any, io: any) => {
         console.log("Played Cards: ", playedCards);
         if (playedCards.length === players.length - 1) {
             io.in(roomCode).emit("game state update player", { players, playedCards });
+        } else {
+            io.in(roomCode).emit("players update", { players });
         }
     });
 
@@ -37,6 +39,7 @@ module.exports = (socket: any, io: any) => {
         const room = roomExists(roomCode);
         const winnerCard = room.game.pickWinnerCard(cardId);
         const players = room.game.getAllPlayers();
+        room.game.setPlayersSubmitClicksToFalse();
         io.in(roomCode).emit("game state update judge", { players, winnerCard });
     });
 
@@ -44,6 +47,7 @@ module.exports = (socket: any, io: any) => {
         console.log("next turn");
         const room = roomExists(roomCode);
         room.game.addNextClick(playerId);
+        const players = room.game.getAllPlayers();
         if (room.game.next_clicks.length === room.game.players.length) {
             console.log("next turn complete");
             room.game.refillCards();
@@ -52,10 +56,13 @@ module.exports = (socket: any, io: any) => {
             room.game.drawBlackCard();
             room.game.next_clicks = [];
             room.game.played_cards = [];
+            room.game.setPlayersNextClicksToFalse();
             const players = room.game.getAllPlayers();
             const blackCard = room.game.current_black_card;
             const round = room.game.round;
             io.in(roomCode).emit("next turn client", { players, blackCard, round });
+        } else {
+            io.in(roomCode).emit("players update", { players });
         }
     });
 }

@@ -82,9 +82,13 @@ export default function Room({ match, history }: Props) {
   };
 
   const handleStartGame = () => {
-    setGameStarted(true);
-    socket.emit("start game", { roomCode: roomCode });
-    socket.emit("game state init", { roomCode: roomCode });
+    if(users.length > 1){
+      setGameStarted(true);
+      socket.emit("start game", { roomCode: roomCode });
+      socket.emit("game state init", { roomCode: roomCode });
+    } else {
+      alert("Not enough players.")
+    }
   };
   
 

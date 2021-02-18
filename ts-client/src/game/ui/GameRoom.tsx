@@ -31,6 +31,7 @@ export default function GameRoom(props: Props) {
   const [hideSubmit, setHideSubmit] = useState(false);
   const [round, setRound] = useState<Number>(1);
 
+  const [gameOver, setGameOver] = useState(false);
   const socket = useContext(SocketContext);
 
   useEffect(() => {
@@ -84,6 +85,19 @@ export default function GameRoom(props: Props) {
     );
 
     socket.on(
+        "players update",
+        ({
+          players,
+        }: {
+          players: Player[];
+        }) => {
+          setPlayers(players);
+          const player = extractCurrentPlayer(players);
+          setCurrentPlayer(player);
+        }
+      );
+
+    socket.on(
       "next turn client",
       ({
         players,
@@ -108,6 +122,7 @@ export default function GameRoom(props: Props) {
         setHideSubmit(false);
         setHideNext(true);
         setRound(round);
+        if(round > props.setting.rounds) setGameOver(true);
       }
     );
   });
@@ -287,8 +302,8 @@ export default function GameRoom(props: Props) {
   return (
     <>
       <p>Game Room</p>
-      <ScoreBoard players={players} />
-      {round > props.setting.rounds ? (
+      <ScoreBoard players={players} gameOver={gameOver}/>
+      {gameOver ? (
         renderGameOver()
       ) : (
         <div>

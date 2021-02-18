@@ -115,6 +115,7 @@ class Game {
             console.log(playerId + " card: ", card);
             card && this.played_cards.push(card);
             player.removeCard(id);
+            player.submitClicked = true;
         }
     };
 
@@ -148,9 +149,25 @@ class Game {
     addNextClick = (playerId: string) => {
         const exists = this.next_clicks.find((item) => item === playerId);
         if (!exists) {
+            const player = this.getPlayerById(playerId);
+            if (player) player.nextClicked = true;
             this.next_clicks.push(playerId);
         }
     };
+
+    setPlayersSubmitClicksToFalse = () => {
+        for (let i = 0; i < this.players.length; i++) {
+            if (!this.players[i].isJudge) {
+                this.players[i].submitClicked = false;
+            }
+        }
+    }
+
+    setPlayersNextClicksToFalse = () => {
+        for (let i = 0; i < this.players.length; i++) {
+            this.players[i].nextClicked = false;
+        }
+    }
 }
 
 export { Game };

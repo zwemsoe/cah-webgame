@@ -1,4 +1,4 @@
-import {User, WhiteCard, BlackCard} from '../interfaces';
+import { User, WhiteCard, BlackCard } from '../interfaces';
 
 class Player {
     name = "";
@@ -6,14 +6,16 @@ class Player {
     isJudge = false;
     cards: WhiteCard[] = [];
     judge_cards: BlackCard[] = [];
+    submitClicked = false;
+    nextClicked = false;
     points = 0;
 
-    constructor(user: User){
+    constructor(user: User) {
         this.name = user.name;
         this.id = user.id;
     }
 
-    removeCard = (id:string) => {
+    removeCard = (id: string) => {
         const new_cards = this.cards.filter((item, i, arr) => {
             return item.id !== id;
         });
@@ -26,4 +28,4 @@ class Player {
 
 }
 
-export {Player};
+export { Player };
