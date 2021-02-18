@@ -21,7 +21,7 @@ const App = () => {
       <Switch> 
         <SocketContext.Provider value={socket}>
           <Route path='/' exact render={(props) => <Home {...props} setClientName={setClientName}/>} />
-          <Route path='/:roomId' exact render={(props) => clientName ? <Room {...props}/> : <Home {...props} setClientName={setClientName}/>} />
+          <Route path='/game/:roomId' exact render={(props) => clientName ? <Room {...props}/> : <Home {...props} setClientName={setClientName}/>} />
         </SocketContext.Provider>
     </Switch>
     </BrowserRouter>

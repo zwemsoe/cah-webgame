@@ -8,23 +8,21 @@ export interface Room {
     id: string,
     users: User[],
     settings: Setting,
+    game: any,
 }
 
 export interface Setting {
     rounds: number,
-    judgeTime: number,
-    pickTime: number,
 }
 
-export interface WhiteCard{
+export interface WhiteCard {
     content: string,
     draw: number,
     cardOwner?: string,
     id?: string, //to track on cards list
 }
 
-export interface BlackCard{
+export interface BlackCard {
     content: string,
     draw: number,
-    pick: number,
 }

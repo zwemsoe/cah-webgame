@@ -3,7 +3,7 @@ import Lobby from "../components/Lobby";
 import { SocketContext } from "../contexts/SocketContext";
 import GameRoom from "../game/ui/GameRoom";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { User, Setting } from "../interfaces";
+import { User, Setting, Player, BlackCard, WhiteCard } from "../interfaces";
 
 interface Props {
   history: any;
@@ -12,19 +12,17 @@ interface Props {
 
 var defaultSetting: Setting = {
   rounds: 3,
-  judgeTime: 60,
-  pickTime: 60,
 };
 
 export default function Room({ match, history }: Props) {
   const roomCode = match.params.roomId;
-  const [players, setPlayers] = useLocalStorage(`room-players-${roomCode}`, []);
-  const [hostPlayer, setHostPlayer] = useLocalStorage(
-    `host-player-${roomCode}`,
+  const [users, setUsers] = useLocalStorage(`room-Users-${roomCode}`, []);
+  const [hostUser, setHostUser] = useLocalStorage(
+    `host-User-${roomCode}`,
     undefined
   );
-  const [currentPlayer, setCurrentPlayer] = useLocalStorage(
-    `current-player-${history.location.state.clientId}`,
+  const [currentUser, setCurrentUser] = useLocalStorage(
+    `current-User-${history.location.state.clientId}`,
     undefined
   );
   const [lastJoined, setLastJoined] = useState<number | null>(null);
@@ -32,7 +30,7 @@ export default function Room({ match, history }: Props) {
   const [setting, changeSetting] = useState<Setting>(defaultSetting);
   const settingRef = useRef(defaultSetting);
   settingRef.current = setting;
-
+  
   const socket = useContext(SocketContext);
 
   useEffect(() => {
@@ -45,30 +43,26 @@ export default function Room({ match, history }: Props) {
   useEffect(() => {
     socket.on("room status", ({ clients }: { clients: User[] }) => {
       console.log(`Clients: `, clients);
-      setPlayers(clients);
+      setUsers(clients);
       if (clients.length !== 0) {
         setLastJoined(clients.length - 1);
-        setHostPlayer(clients[0]);
+        setHostUser(clients[0]);
         var id: string | undefined = history.location.state.clientId;
-        setCurrentPlayer(clients.find((client) => client.id === id));
+        setCurrentUser(clients.find((client) => client.id === id));
       }
     });
-  }, [players]);
+  }, [users]);
 
   useEffect(() => {
     socket.on("setting update", ({ settings }: { settings: Setting }) => {
-      if (hostPlayer && currentPlayer) {
-        if (hostPlayer.id !== currentPlayer.id) {
+      if (hostUser && currentUser) {
+        if (hostUser.id !== currentUser.id) {
           changeSetting(settings);
         }
       }
     });
     socket.on("game start update", () => {
-      if (hostPlayer && currentPlayer) {
-        if (hostPlayer.id !== currentPlayer.id) {
-          setGameStarted(true);
-        }
-      }
+      setGameStarted(true);
     });
   });
 
@@ -88,24 +82,30 @@ export default function Room({ match, history }: Props) {
   };
 
   const handleStartGame = () => {
-    setGameStarted(true);
-    socket.emit("start game", { roomCode: roomCode });
+    if(users.length > 1){
+      setGameStarted(true);
+      socket.emit("start game", { roomCode: roomCode });
+      socket.emit("game state init", { roomCode: roomCode });
+    } else {
+      alert("Not enough players.")
+    }
   };
+  
 
   return (
     <>
       {gameStarted ? (
-        <GameRoom />
+        <GameRoom currentUser = {currentUser} roomCode = {roomCode} setting = {settingRef.current} history={history}/>
       ) : (
         <Lobby
           setting={setting}
           handleSetting={handleSetting}
-          players={players}
-          hostPlayer={hostPlayer}
-          currentPlayer={currentPlayer}
+          players={users}
+          hostPlayer={hostUser}
+          currentPlayer={currentUser}
           lastJoined={lastJoined}
           handleStartGame={handleStartGame}
-          match = {match}
+          match={match}
         />
       )}
     </>

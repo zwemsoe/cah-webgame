@@ -36,7 +36,7 @@ export default function Home({ history, setClientName, match }: Props) {
       });
 
       setTimeout(() => {
-        history.push("/" + code, { clientId });
+        history.push("/game/" + code, { clientId });
         setClientName(name);
       }, 2000);
     } else {

@@ -21,9 +21,8 @@ const createRoom = (roomId: string) => {
     users: [],
     settings: {
       rounds: 3,
-      judgeTime: 60,
-      pickTime: 60,
     },
+    game: null,
   };
   rooms.push(room);
 };
@@ -54,35 +53,12 @@ const getRoomSettings = (roomCode: string) => {
   }
 };
 
-const testUsers: User[] = [
-  {
-    id: "1",
-    name: "John",
-    roomId: "abc",
-  },
-  {
-    id: "2",
-    name: "John2",
-    roomId: "abc",
-  },
-  {
-    id: "3",
-    name: "John3",
-    roomId: "abc",
-  },
-  {
-    id: "4",
-    name: "John4",
-    roomId: "abc",
-  },
-];
 
 module.exports = {
   addUser,
   createRoom,
   roomExists,
   getAllUsers,
-  testUsers,
   changeRoomSettings,
   getRoomSettings,
 };
