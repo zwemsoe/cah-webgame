@@ -12,8 +12,6 @@ interface Props {
 
 var defaultSetting: Setting = {
   rounds: 3,
-  judgeTime: 60,
-  pickTime: 60,
 };
 
 export default function Room({ match, history }: Props) {
@@ -33,9 +31,6 @@ export default function Room({ match, history }: Props) {
   const settingRef = useRef(defaultSetting);
   settingRef.current = setting;
   
-  //GameRoom related
-
-
   const socket = useContext(SocketContext);
 
   useEffect(() => {
@@ -96,7 +91,7 @@ export default function Room({ match, history }: Props) {
   return (
     <>
       {gameStarted ? (
-        <GameRoom currentUser = {currentUser} roomCode = {roomCode}/>
+        <GameRoom currentUser = {currentUser} roomCode = {roomCode} setting = {settingRef.current} history={history}/>
       ) : (
         <Lobby
           setting={setting}

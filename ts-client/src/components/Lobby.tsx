@@ -32,36 +32,6 @@ export default function Lobby(props: Props) {
               <option value="5">5</option>
             </select>
             <br />
-
-            <label htmlFor="judge-select" className="mr-5">
-              Judge Time:
-            </label>
-            <select
-              className="w-auto border bg-white rounded px-3 py-2 outline-none"
-              name="judgeTime"
-              value={props.setting.judgeTime}
-              onChange={props.handleSetting}
-            >
-              <option value="60">60s</option>
-              <option value="90">90s</option>
-              <option value="120">120s</option>
-            </select>
-            <br />
-
-            <label htmlFor="pick-select" className="mr-5">
-              Pick Time:
-            </label>
-            <select
-              className="w-auto border bg-white rounded px-3 py-2 outline-none mb-2"
-              name="pickTime"
-              value={props.setting.pickTime}
-              onChange={props.handleSetting}
-            >
-              <option value="60">60s</option>
-              <option value="90">90s</option>
-              <option value="120">120s</option>
-            </select>
-            <br />
             <button
               className="bg-yellow-500 hover:bg-yellow-300 text-black font-bold h-10 w-28 rounded"
               onClick={props.handleStartGame}
@@ -77,18 +47,6 @@ export default function Lobby(props: Props) {
               Number of Rounds:
             </label>
             <p>{props.setting.rounds}</p>
-            <br />
-
-            <label htmlFor="judge-select" className="mr-5">
-              Judge Time:
-            </label>
-            <p>{props.setting.judgeTime}s</p>
-            <br />
-
-            <label htmlFor="pick-select" className="mr-5">
-              Pick Time:
-            </label>
-            <p>{props.setting.pickTime}s</p>
             <br />
           </div>
         );
@@ -113,7 +71,7 @@ export default function Lobby(props: Props) {
           );
         })}
       </ul>
-      
+
       <p className="font-bold">Settings</p>
       {renderSettings()}
       <p className="mt-3">

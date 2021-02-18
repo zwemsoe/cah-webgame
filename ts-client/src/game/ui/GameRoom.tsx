@@ -1,5 +1,5 @@
 import ScoreBoard from "./ScoreBoard";
-import { User, Player, WhiteCard, BlackCard } from "../../interfaces";
+import { User, Player, WhiteCard, BlackCard, Setting } from "../../interfaces";
 import { useState, useContext, useEffect } from "react";
 import Whitecard from "./Whitecard";
 import Blackcard from "./Blackcard";
@@ -9,6 +9,8 @@ import { SocketContext } from "../../contexts/SocketContext";
 interface Props {
   currentUser: User;
   roomCode: string;
+  setting: Setting;
+  history: any;
 }
 
 export default function GameRoom(props: Props) {
@@ -20,12 +22,14 @@ export default function GameRoom(props: Props) {
   const [currentWhiteCard, setWhiteCard] = useState<WhiteCard>();
   const [judgeWhiteCard, setJudgeWhiteCard] = useState<WhiteCard>();
   const [winnerCard, setWinnerCard] = useState<WhiteCard>();
+  const [winnerPlayer, setWinnerPlayer] = useState<string>();
   const [playedCards, setPlayedCards] = useState<WhiteCard[]>([]);
   const [judgeMode, setJudgeMode] = useState(false);
   const [submitClicked, setSubmitClicked] = useState(false);
   const [nextClicked, setNextClicked] = useState(false);
   const [hideNext, setHideNext] = useState(true);
   const [hideSubmit, setHideSubmit] = useState(false);
+  const [round, setRound] = useState<Number>(1);
 
   const socket = useContext(SocketContext);
 
@@ -72,6 +76,7 @@ export default function GameRoom(props: Props) {
         const player = extractCurrentPlayer(players);
         setCurrentPlayer(player);
         setWinnerCard(winnerCard);
+        setWinnerPlayer(extractPlayerById(winnerCard.cardOwner));
         setJudgeMode(false);
         setSubmitClicked(false);
         setHideNext(false);
@@ -80,18 +85,29 @@ export default function GameRoom(props: Props) {
 
     socket.on(
       "next turn client",
-      ({ players, blackCard }: { players: Player[]; blackCard: BlackCard }) => {
+      ({
+        players,
+        blackCard,
+        round,
+      }: {
+        players: Player[];
+        blackCard: BlackCard;
+        round: Number;
+      }) => {
         setPlayers(players);
         const player = extractCurrentPlayer(players);
         setCurrentPlayer(player);
         setCurrentBlackCard(blackCard);
         setPlayedCards([]);
         setWinnerCard(undefined);
+        setWinnerPlayer(undefined);
+        setJudgeWhiteCard(undefined);
         setJudgeMode(false);
         setSubmitClicked(false);
         setNextClicked(false);
         setHideSubmit(false);
         setHideNext(true);
+        setRound(round);
       }
     );
   });
@@ -100,6 +116,14 @@ export default function GameRoom(props: Props) {
     for (let i = 0; i < players.length; i++) {
       if (players[i].id === props.currentUser?.id) {
         return players[i];
+      }
+    }
+  };
+
+  const extractPlayerById = (playerId: string | undefined) => {
+    for (let i = 0; i < players.length; i++) {
+      if (players[i].id === playerId) {
+        return players[i].name;
       }
     }
   };
@@ -140,7 +164,9 @@ export default function GameRoom(props: Props) {
       <div>
         <p>Black card: </p>
         {currentBlackCard && <Blackcard card={currentBlackCard} />}
-        {winnerCard && <Whitecard card={winnerCard} disabled={true} />}
+        {winnerCard && winnerPlayer && (
+          <WinnerCard card={winnerCard} name={winnerPlayer} />
+        )}
       </div>
     );
   };
@@ -242,21 +268,44 @@ export default function GameRoom(props: Props) {
     );
   };
 
+  const renderGameOver = () => {
+    return (
+      <div>
+        <p>Game Over</p>
+        <button
+          className="bg-blue-500 hover:bg-red-300 text-white h-10 w-28 "
+          onClick={() => {
+            props.history.push("/");
+          }}
+        >
+          Back to Home
+        </button>
+      </div>
+    );
+  };
+
   return (
     <>
       <p>Game Room</p>
       <ScoreBoard players={players} />
-      <div className="grid grid-cols-3 gap-10 mt-11">
-        <div>{currentPlayer && renderWhiteCards()}</div>
+      {round > props.setting.rounds ? (
+        renderGameOver()
+      ) : (
         <div>
-          {!hideNext && renderNextButton()}
-          {renderCurrentBlackCard()}
-          {playedCards && renderCardsPlayed()}
+          <p className="text-2xl">Round: {round}</p>
+          <div className="grid grid-cols-3 gap-10 mt-11">
+            <div>{currentPlayer && renderWhiteCards()}</div>
+            <div>
+              {!hideNext && renderNextButton()}
+              {renderCurrentBlackCard()}
+              {playedCards && renderCardsPlayed()}
+            </div>
+            <div>
+              {currentPlayer?.isJudge && judgeMode && renderCardsReceived()}
+            </div>
+          </div>
         </div>
-        <div>
-          {currentPlayer?.isJudge && judgeMode && renderCardsReceived()}
-        </div>
-      </div>
+      )}
     </>
   );
 }

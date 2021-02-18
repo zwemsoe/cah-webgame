@@ -2,6 +2,7 @@ import { WhiteCard } from "../../interfaces";
 
 interface Props {
   card: WhiteCard;
+  name: string;
 }
 export default function Blackcard(props: Props) {
   return (
@@ -11,6 +12,7 @@ export default function Blackcard(props: Props) {
             <p className="text-black text-base">
               {props.card.content}
             </p>
+            <p className="text-red-900">by {props.name}</p>
           </div>
         </div>
     </>

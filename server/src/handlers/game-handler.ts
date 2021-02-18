@@ -1,11 +1,6 @@
 import { Game } from "../models/game";
 const {
-    addUser,
-    createRoom,
     roomExists,
-    getAllUsers,
-    changeRoomSettings,
-    getRoomSettings,
 } = require("../room-manager");
 
 
@@ -16,7 +11,7 @@ module.exports = (socket: any, io: any) => {
     });
 
     socket.on("game state init", async ({ roomCode }: { roomCode: string }) => {
-        console.log("starting game");
+        console.log("game init");
         const room = roomExists(roomCode);
         room.game = new Game(room.users);
         await room.game.init();
@@ -26,6 +21,7 @@ module.exports = (socket: any, io: any) => {
     });
 
     socket.on("card select by player", async ({ cardId, playerId, roomCode }: { cardId: string, playerId: string, roomCode: string }) => {
+        console.log("select card by player");
         const room = roomExists(roomCode);
         room.game.playCard(cardId, playerId);
         const players = room.game.getAllPlayers();
@@ -37,7 +33,7 @@ module.exports = (socket: any, io: any) => {
     });
 
     socket.on("card select by judge", async ({ cardId, playerId, roomCode }: { cardId: string, playerId: string, roomCode: string }) => {
-        console.log("starting game");
+        console.log("select card by judge");
         const room = roomExists(roomCode);
         const winnerCard = room.game.pickWinnerCard(cardId);
         const players = room.game.getAllPlayers();
@@ -45,17 +41,21 @@ module.exports = (socket: any, io: any) => {
     });
 
     socket.on("next turn", async ({ roomCode, playerId }: { roomCode: string, playerId: string }) => {
+        console.log("next turn");
         const room = roomExists(roomCode);
         room.game.addNextClick(playerId);
         if (room.game.next_clicks.length === room.game.players.length) {
+            console.log("next turn complete");
             room.game.refillCards();
+            room.game.updateRound();
             room.game.updateJudge();
             room.game.drawBlackCard();
             room.game.next_clicks = [];
             room.game.played_cards = [];
             const players = room.game.getAllPlayers();
             const blackCard = room.game.current_black_card;
-            io.in(roomCode).emit("next turn client", { players, blackCard });
+            const round = room.game.round;
+            io.in(roomCode).emit("next turn client", { players, blackCard, round });
         }
     });
 }

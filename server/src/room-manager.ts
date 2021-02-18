@@ -21,8 +21,6 @@ const createRoom = (roomId: string) => {
     users: [],
     settings: {
       rounds: 3,
-      judgeTime: 60,
-      pickTime: 60,
     },
     game: null,
   };

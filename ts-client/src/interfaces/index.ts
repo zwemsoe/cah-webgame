@@ -11,13 +11,11 @@ export interface Room {
 
 export interface Setting {
     rounds: number,
-    judgeTime: number,
-    pickTime: number,
 }
 
 
 //Game
-export interface Player{
+export interface Player {
     id: string,
     name: string,
     points: number,
@@ -26,14 +24,14 @@ export interface Player{
     cards: WhiteCard[],
 }
 
-export interface WhiteCard{
+export interface WhiteCard {
     content: string,
     draw: number,
     cardOwner?: string,
     id?: string, //to track on cards list
 }
 
-export interface BlackCard{
+export interface BlackCard {
     content: string,
     draw: number,
 }
