@@ -12,7 +12,6 @@ interface Props {
 }
 
 export default function Lobby(props: Props) {
-  console.log();
   const renderSettings = () => {
     if (props.hostPlayer && props.currentPlayer) {
       if (props.hostPlayer.id === props.currentPlayer.id) {

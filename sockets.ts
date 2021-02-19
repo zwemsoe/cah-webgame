@@ -1,8 +1,11 @@
+import { config } from './constants';
+
+const url = config.url.CLIENT_URL;
 
 export default (server: any) => {
     const io = require('socket.io')(server, {
         cors: {
-            origin: "https://cah-webgame.web.app",
+            origin: url,
             credentials: true,
         },
     });

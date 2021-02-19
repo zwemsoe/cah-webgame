@@ -251,7 +251,7 @@ export default function GameRoom(props: Props) {
         <button
           className={`${
             submitClicked ? "bg-green-500" : "bg-red-500"
-          } hover:bg-yellow-300 text-white h-10 w-28 `}
+          } hover:bg-green-500 text-white h-10 w-28 `}
           onClick={handleSubmit}
         >
           Submit
@@ -274,7 +274,7 @@ export default function GameRoom(props: Props) {
         <button
           className={`${
             nextClicked ? "bg-green-500" : "bg-yellow-500"
-          } hover:bg-red-300 text-white h-10 w-28 `}
+          } hover:bg-green-500 text-white h-10 w-28 `}
           onClick={handleNext}
         >
           Next
@@ -288,7 +288,7 @@ export default function GameRoom(props: Props) {
       <div>
         <p>Game Over</p>
         <button
-          className="bg-blue-500 hover:bg-red-300 text-white h-10 w-28 "
+          className="bg-blue-500 hover:bg-gray-500 text-white h-10 w-28 "
           onClick={() => {
             socket.emit("delete room", {roomCode: props.roomCode});
             props.history.push("/");

@@ -2,6 +2,10 @@ import { User, Room, Setting } from "./interfaces";
 
 export let rooms: Room[] = [];
 
+const printRooms = () => {
+  console.log(rooms);
+}
+
 const addUser = (roomId: string, clientName: string, clientId: string) => {
   const selected_room = rooms.find((room) => room.id === roomId);
   if (selected_room) {
@@ -65,6 +69,7 @@ const deleteRoom = (roomCode: string) => {
 
 
 module.exports = {
+  printRooms,
   addUser,
   createRoom,
   roomExists,

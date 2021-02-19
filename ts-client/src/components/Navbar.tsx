@@ -12,24 +12,27 @@ export const Navbar = () => {
         <ul className="list-reset md:flex md:items-center">
           <li className="md:ml-4">
             <a
-              className="block no-underline hover:underline py-2 text-white hover:text-black md:border-none md:p-0"
-              href="/#"
+              className="block no-underline hover:underline py-2 text-white hover:text-gray-200 md:border-none md:p-0"
+              href="https://youtu.be/Uyciy8LmmXg"
+              target="_blank"
             >
               How to Play
             </a>
           </li>
           <li className="md:ml-4">
             <a
-              className="border-t block no-underline hover:underline py-2 text-white hover:text-black md:border-none md:p-0"
-              href="/#"
+              className="border-t block no-underline hover:underline py-2 text-white hover:text-gray-200 md:border-none md:p-0"
+              href="https://github.com/zwemsoe/cah-webgame.git"
+              target="_blank"
             >
               About
             </a>
           </li>
           <li className="md:ml-4">
             <a
-              className="border-t block no-underline hover:underline py-2 text-white hover:text-black md:border-none md:p-0"
-              href="/#"
+              className="border-t block no-underline hover:underline py-2 text-white hover:text-gray-200 md:border-none md:p-0"
+              href="https://www.linkedin.com/in/zwe-min-soe-0b15091a8/"
+              target="_blank"
             >
               Contact
             </a>

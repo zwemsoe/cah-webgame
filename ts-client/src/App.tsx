@@ -8,7 +8,6 @@ const App = () => {
   const [clientName, setClientName] = useState<string>("");
 
   useEffect(() => {
-    console.log("clientname: ", clientName);
     return () => {
       console.log("unmounting");
       socket.close();

@@ -42,7 +42,6 @@ export default function Room({ match, history }: Props) {
 
   useEffect(() => {
     socket.on("room status", ({ clients }: { clients: User[] }) => {
-      console.log(`Clients: `, clients);
       setUsers(clients);
       if (clients.length !== 0) {
         setLastJoined(clients.length - 1);

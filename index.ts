@@ -12,7 +12,6 @@ app.get('/', (req, res) => {
   res.send("Serving for app deployed at https://cah-webgame.web.app")
 });
 
-
 const port = process.env.PORT || 5000;
 
 server.listen(port, () => {

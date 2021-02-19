@@ -113,7 +113,6 @@ class Game {
             const card = player.cards.find((item, i, arr) => {
                 return item.id === id;
             });
-            console.log(playerId + " card: ", card);
             card && this.played_cards.push(card);
             player.removeCard(id);
             player.submitClicked = true;
