@@ -2,7 +2,7 @@
 export default (server: any) => {
     const io = require('socket.io')(server, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: "https://cah-webgame.firebaseapp.com/",
             credentials: true,
         },
     });
