@@ -73,7 +73,7 @@ export default function Home({ history, setClientName, match }: Props) {
                 className="bg-yellow-500 hover:bg-yellow-300 text-black font-bold h-10 rounded-full"
                 onClick={handleJoin}
               >
-                Join Room
+                Join
               </button>
             </div>
           </div>

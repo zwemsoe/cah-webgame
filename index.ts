@@ -9,7 +9,7 @@ app.use(cors());
 sockets(server);
 
 app.get('/', (req, res) => {
-  res.send("Serving for app deployed at https://cah-webgame.firebaseapp.com/")
+  res.send("Serving for app deployed at https://cah-webgame.web.app")
 });
 
 
