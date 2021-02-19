@@ -290,6 +290,7 @@ export default function GameRoom(props: Props) {
         <button
           className="bg-blue-500 hover:bg-red-300 text-white h-10 w-28 "
           onClick={() => {
+            socket.emit("delete room", {roomCode: props.roomCode});
             props.history.push("/");
           }}
         >

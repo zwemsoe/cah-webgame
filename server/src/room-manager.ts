@@ -1,6 +1,6 @@
 import { User, Room, Setting } from "./interfaces";
 
-let rooms: Room[] = [];
+export let rooms: Room[] = [];
 
 const addUser = (roomId: string, clientName: string, clientId: string) => {
   const selected_room = rooms.find((room) => room.id === roomId);
@@ -53,6 +53,16 @@ const getRoomSettings = (roomCode: string) => {
   }
 };
 
+const deleteRoom = (roomCode: string) => {
+  const room = roomExists(roomCode);
+  if (room) {
+    const filtered = rooms.filter((item, index, arr) => {
+      return item.id !== room.id;
+    });
+    rooms = filtered;
+  }
+}
+
 
 module.exports = {
   addUser,
@@ -61,4 +71,5 @@ module.exports = {
   getAllUsers,
   changeRoomSettings,
   getRoomSettings,
+  deleteRoom
 };

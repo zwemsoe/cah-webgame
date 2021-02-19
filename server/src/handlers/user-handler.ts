@@ -5,6 +5,7 @@ const {
   getAllUsers,
   changeRoomSettings,
   getRoomSettings,
+  deleteRoom,
 } = require("../room-manager");
 import { Setting } from "../interfaces";
 
@@ -56,6 +57,11 @@ module.exports = (socket: any, io: any) => {
   socket.on("get room setting", ({ roomCode }: { roomCode: string }) => {
     const settings: Setting = getRoomSettings(roomCode);
     io.in(roomCode).emit("setting update", { settings });
+  });
+
+  socket.on("delete room", async ({ roomCode }: { roomCode: string }) => {
+    console.log("deleting room");
+    deleteRoom(roomCode);
   });
 
   //user leaves
