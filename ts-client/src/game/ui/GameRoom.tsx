@@ -50,15 +50,15 @@ export default function GameRoom(props: Props) {
       "game state update player",
       ({
         players,
-        playedCards,
+        shuffled,
       }: {
         players: Player[];
-        playedCards: WhiteCard[];
+        shuffled: WhiteCard[];
       }) => {
         setPlayers(players);
         const player = extractCurrentPlayer(players);
         setCurrentPlayer(player);
-        setPlayedCards(playedCards);
+        setPlayedCards(shuffled);
         setJudgeMode(true);
         setSubmitClicked(false);
         setHideSubmit(true);
@@ -113,6 +113,7 @@ export default function GameRoom(props: Props) {
         setCurrentPlayer(player);
         setCurrentBlackCard(blackCard);
         setPlayedCards([]);
+        setWhiteCard(undefined);
         setWinnerCard(undefined);
         setWinnerPlayer(undefined);
         setJudgeWhiteCard(undefined);
@@ -227,21 +228,21 @@ export default function GameRoom(props: Props) {
     if (judgeMode) {
       if (judgeWhiteCard) {
         socket.emit("card select by judge", {
-          cardId: judgeWhiteCard?.id,
+          cardId: judgeWhiteCard.id,
           playerId: currentPlayer?.id,
           roomCode: props.roomCode,
         });
         setSubmitClicked(true);
       }
     } else {
-      if (currentWhiteCard) {
-        socket.emit("card select by player", {
-          cardId: currentWhiteCard?.id,
-          playerId: currentPlayer?.id,
-          roomCode: props.roomCode,
-        });
-        setSubmitClicked(true);
-      }
+      if (currentWhiteCard && !submitClicked) {
+          socket.emit("card select by player", {
+            cardId: currentWhiteCard.id,
+            playerId: currentPlayer?.id,
+            roomCode: props.roomCode,
+          });
+          setSubmitClicked(true);
+      } 
     }
   };
 

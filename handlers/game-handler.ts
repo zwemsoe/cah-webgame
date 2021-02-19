@@ -29,7 +29,9 @@ module.exports = (socket: any, io: any) => {
         const playedCards = room.game.played_cards;
         console.log("Played Cards: ", playedCards);
         if (playedCards.length === players.length - 1) {
-            io.in(roomCode).emit("game state update player", { players, playedCards });
+            const shuffled = room.game.shufflePlayedCards();
+            console.log("After Shuffled: ", shuffled);
+            io.in(roomCode).emit("game state update player", { players, shuffled });
         } else {
             io.in(roomCode).emit("players update", { players });
         }

@@ -15,6 +15,7 @@ export const Navbar = () => {
               className="block no-underline hover:underline py-2 text-white hover:text-gray-200 md:border-none md:p-0"
               href="https://youtu.be/Uyciy8LmmXg"
               target="_blank"
+              rel="noreferrer"
             >
               How to Play
             </a>
@@ -24,6 +25,7 @@ export const Navbar = () => {
               className="border-t block no-underline hover:underline py-2 text-white hover:text-gray-200 md:border-none md:p-0"
               href="https://github.com/zwemsoe/cah-webgame.git"
               target="_blank"
+              rel="noreferrer"
             >
               About
             </a>
@@ -33,6 +35,7 @@ export const Navbar = () => {
               className="border-t block no-underline hover:underline py-2 text-white hover:text-gray-200 md:border-none md:p-0"
               href="https://www.linkedin.com/in/zwe-min-soe-0b15091a8/"
               target="_blank"
+              rel="noreferrer"
             >
               Contact
             </a>

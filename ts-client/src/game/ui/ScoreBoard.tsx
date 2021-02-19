@@ -18,7 +18,7 @@ export default function ScoreBoard(props: Props) {
           const player = props.players.filter((p) => p.points === max_points);
           setGameWinner(player);
       }
-  })
+  }, [props.gameOver, props.players])
 
   const renderPlayerState = (player: Player) => {
     if (player?.isJudge) {

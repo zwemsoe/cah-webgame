@@ -22,7 +22,7 @@ export default function Home({ history, setClientName, match }: Props) {
     } else {
       setCode(uuid());
     }
-  }, []);
+  }, [match.params.roomId]);
 
   const handleJoin = () => {
     if(name){

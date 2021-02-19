@@ -1,4 +1,4 @@
-import { BlackCard, WhiteCard } from "../../interfaces";
+import { BlackCard } from "../../interfaces";
 
 interface Props {
   card: BlackCard;

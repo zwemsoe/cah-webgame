@@ -39,7 +39,7 @@ export default function Room({ match, history }: Props) {
       roomCode: roomCode,
     });
     socket.emit("get room setting", { roomCode: roomCode });
-  }, []);
+  }, [roomCode, socket]);
 
   useEffect(() => {
     socket.on("room status", ({ clients }: { clients: User[] }) => {
@@ -51,7 +51,7 @@ export default function Room({ match, history }: Props) {
         setCurrentUser(clients.find((client) => client.id === id));
       }
     });
-  }, [users]);
+  }, [users, socket]);
 
   useEffect(() => {
     socket.on("setting update", ({ settings }: { settings: Setting }) => {

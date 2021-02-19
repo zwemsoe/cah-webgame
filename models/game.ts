@@ -1,6 +1,6 @@
-import { randomString } from "../utils";
 import { User, WhiteCard, BlackCard } from "../interfaces";
 import { Player } from "./player";
+import { v4 as uuid } from 'uuid';
 import axios from "axios";
 
 class Game {
@@ -87,7 +87,7 @@ class Game {
                 if (card.draw === 1) {
                     card.draw--;
                     card.cardOwner = player.id;
-                    card.id = randomString(10);
+                    card.id = uuid();
                     player.cards.push(card);
                 }
             }
@@ -167,6 +167,19 @@ class Game {
         for (let i = 0; i < this.players.length; i++) {
             this.players[i].nextClicked = false;
         }
+    }
+
+    shufflePlayedCards = () => {
+        //Deep clone
+        let shuffled = JSON.parse(JSON.stringify(this.played_cards));
+        // Fisher-Yates Algorithm
+        for (let i = this.played_cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * i);
+            const temp = shuffled[i];
+            shuffled[i] = shuffled[j];
+            shuffled[j] = temp;
+        }
+        return shuffled;
     }
 }
 
