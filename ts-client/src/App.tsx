@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import Home from "./screens/Home";
-import Room from "./screens/Room";
+import Room from './screens/Room';
 import {SocketContext, socket} from './contexts/SocketContext';
 
 const App = () => {
