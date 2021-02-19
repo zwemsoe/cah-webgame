@@ -2,7 +2,7 @@
 export default (server: any) => {
     const io = require('socket.io')(server, {
         cors: {
-            origin: "https://cah-project.herokuapp.com/",
+            origin: "http://localhost:3000",
             credentials: true,
         },
     });
