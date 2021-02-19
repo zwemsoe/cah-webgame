@@ -8,10 +8,6 @@ const server = require("http").createServer(app);
 app.use(cors());
 sockets(server);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Index');
-});
-
 if (process.env.NODE_ENV === 'production') {
   // Express will serve up production assets
   // like our main.js file, or main.css file!
