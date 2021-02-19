@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Navbar } from "../components/Navbar";
 import { SocketContext } from "../contexts/SocketContext";
 import { v4 as uuid } from 'uuid';
