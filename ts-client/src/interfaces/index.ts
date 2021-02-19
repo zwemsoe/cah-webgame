@@ -11,6 +11,7 @@ export interface Room {
 
 export interface Setting {
     rounds: number,
+    toggleNSFW: boolean,
 }
 
 

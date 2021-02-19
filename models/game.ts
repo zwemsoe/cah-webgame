@@ -13,6 +13,7 @@ class Game {
     round_index = 0;
     round = 1;
     next_clicks: string[] = [];
+    NSFW: boolean = false;
 
     constructor(users: User[]) {
         this.assignPlayers(users);
@@ -56,9 +57,8 @@ class Game {
     };
 
     private populateCards = async () => {
-        // "https://cah.greencoaststudios.com/api/v1/official/main_deck"
         const res = await axios.get(
-            "https://api.jsonbin.io/b/602f541b7c58305d3956eb54"
+            this.NSFW ? "https://cah.greencoaststudios.com/api/v1/official/main_deck" : "https://api.jsonbin.io/b/602f541b7c58305d3956eb54"
         );
         this.black_cards = res.data.black;
         res.data.black.map((item: any) => {

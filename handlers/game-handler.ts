@@ -14,6 +14,7 @@ module.exports = (socket: any, io: any) => {
         console.log("game init");
         const room = roomExists(roomCode);
         room.game = new Game(room.users);
+        room.game.NSFW = room.settings.toggleNSFW
         await room.game.init();
         const players = room.game.getAllPlayers();
         const blackCard = room.game.current_black_card;

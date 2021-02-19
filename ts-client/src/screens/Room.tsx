@@ -12,6 +12,7 @@ interface Props {
 
 var defaultSetting: Setting = {
   rounds: 3,
+  toggleNSFW: false,
 };
 
 export default function Room({ match, history }: Props) {
@@ -66,12 +67,19 @@ export default function Room({ match, history }: Props) {
   });
 
   const handleSetting = (e: any) => {
-    const { name, value } = e.target;
+    const { name, value, checked } = e.target;
     const parse_value = parseInt(value);
-    changeSetting((prevState) => ({
-      ...prevState,
-      [name]: parse_value,
-    }));
+    if(checked !== undefined){
+      changeSetting((prevState) => ({
+        ...prevState,
+        toggleNSFW: checked,
+      }));
+    } else {
+      changeSetting((prevState) => ({
+        ...prevState,
+        [name]: parse_value,
+      }));
+    }
     setTimeout(() => {
       socket.emit("change setting", {
         settings: settingRef.current,

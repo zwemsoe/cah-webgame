@@ -9,10 +9,12 @@ export interface Room {
     users: User[],
     settings: Setting,
     game: any,
+    startTime: Date,
 }
 
 export interface Setting {
     rounds: number,
+    toggleNSFW: boolean,
 }
 
 export interface WhiteCard {

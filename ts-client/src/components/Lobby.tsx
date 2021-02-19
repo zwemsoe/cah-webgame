@@ -34,6 +34,26 @@ export default function Lobby(props: Props) {
               <option value="8">8</option>
             </select>
             <br />
+            <div className="flex">
+              <label
+                htmlFor="toogleA"
+                className="flex items-center cursor-pointer"
+              >
+                <div className="relative">
+                  <input
+                    id="toogleA"
+                    type="checkbox"
+                    className="hidden"
+                    name="toggleNSFW"
+                    onChange={props.handleSetting}
+                  />
+                  <div className="toggle__line w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+                  <div className="toggle__dot absolute w-6 h-6 bg-white rounded-full shadow inset-y-0 left-0"></div>
+                </div>
+                <div className="ml-3 text-gray-700 font-medium">NSFW</div>
+              </label>
+            </div>
+            <br />
             <button
               className="bg-yellow-500 hover:bg-yellow-300 text-black font-bold h-10 w-28 rounded"
               onClick={props.handleStartGame}
@@ -50,11 +70,33 @@ export default function Lobby(props: Props) {
             </label>
             <p>{props.setting.rounds}</p>
             <br />
+            <div className="flex">
+              <label
+                htmlFor="toogleA"
+                className="flex items-center cursor-pointer"
+              >
+                <div className="relative">
+                  <input
+                    id="toogleA"
+                    type="checkbox"
+                    className="hidden"
+                    name="toggleNSFW"
+                    checked={props.setting?.toggleNSFW}
+                    disabled
+                  />
+                  <div className="toggle__line w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+                  <div className="toggle__dot absolute w-6 h-6 bg-white rounded-full shadow inset-y-0 left-0"></div>
+                </div>
+                <div className="ml-3 text-gray-700 font-medium">NSFW</div>
+              </label>
+            </div>
+            <br />
           </div>
         );
       }
     }
   };
+
   return (
     <>
       <p className="font-extrabold">
