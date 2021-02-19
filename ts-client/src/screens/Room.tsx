@@ -3,7 +3,7 @@ import Lobby from "../components/Lobby";
 import { SocketContext } from "../contexts/SocketContext";
 import GameRoom from "../game/ui/GameRoom";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { User, Setting, Player, BlackCard, WhiteCard } from "../interfaces";
+import { User, Setting } from "../interfaces";
 
 interface Props {
   history: any;
