@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
   res.send("Serving for app deployed at https://cah-webgame.web.app")
 });
 
-const cleanRooms = schedule.scheduleJob('0 */6 * * *', () => {
+const cleanRooms = schedule.scheduleJob('0 */2 * * *', () => {
   console.log('cleaning...');
   cleanUpExpiredRooms();
 });
