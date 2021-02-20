@@ -6,6 +6,7 @@ const {
   changeRoomSettings,
   getRoomSettings,
   deleteRoom,
+  getUserNameById,
 } = require("../room-manager");
 import { Setting } from "../interfaces";
 
@@ -31,7 +32,7 @@ module.exports = (socket: any, io: any) => {
       if (!roomExists(roomCode)) {
         createRoom(roomCode);
       }
-      addUser(roomCode, clientName, clientId);
+      addUser(roomCode, clientName, clientId, socket.id);
     }
   );
 
@@ -65,7 +66,8 @@ module.exports = (socket: any, io: any) => {
   });
 
   //user leaves
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
+  socket.on("disconnect", (reason: any) => {
+    const name = getUserNameById(socket.id);
+    console.log(name + " disconnected because of " + reason);
   });
 };

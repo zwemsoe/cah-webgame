@@ -7,6 +7,7 @@ export default (server: any) => {
         cors: {
             origin: url,
             credentials: true,
+            pingTimeout: 30000,
         },
     });
 

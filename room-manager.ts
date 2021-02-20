@@ -20,7 +20,7 @@ const cleanUpExpiredRooms = () => {
   }
 }
 
-const addUser = (roomId: string, clientName: string, clientId: string) => {
+const addUser = (roomId: string, clientName: string, clientId: string, socketId: string) => {
   const selected_room = rooms.find((room) => room.id === roomId);
   if (selected_room) {
     const users = selected_room.users;
@@ -28,6 +28,7 @@ const addUser = (roomId: string, clientName: string, clientId: string) => {
       id: clientId,
       name: clientName,
       roomId: roomId,
+      socketId: socketId,
     };
     users.push(user);
   }
@@ -83,6 +84,17 @@ const deleteRoom = (roomCode: string) => {
   }
 }
 
+const getUserNameById = (socketId: string) => {
+  for (let i = 0; i < rooms.length; i++) {
+    const room = rooms[i];
+    for (let j = 0; j < room.users.length; j++) {
+      const user = room.users[j];
+      if (user.socketId === socketId) {
+        return user.name;
+      }
+    }
+  }
+}
 
 module.exports = {
   printRooms,
@@ -93,5 +105,6 @@ module.exports = {
   getAllUsers,
   changeRoomSettings,
   getRoomSettings,
-  deleteRoom
+  deleteRoom,
+  getUserNameById
 };

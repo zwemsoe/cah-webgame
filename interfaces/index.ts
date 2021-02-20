@@ -2,6 +2,7 @@ export interface User {
     id: string,
     name: string,
     roomId: string,
+    socketId?: string,
 }
 
 export interface Room {

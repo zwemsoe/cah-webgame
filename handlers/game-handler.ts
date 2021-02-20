@@ -28,7 +28,7 @@ module.exports = (socket: any, io: any) => {
         const players = room.game.getAllPlayers();
         const playedCards = room.game.played_cards;
         console.log("Played Cards: ", playedCards);
-        if (playedCards.length === players.length - 1) {
+        if (playedCards.length >= players.length - 1) {
             const shuffled = room.game.shufflePlayedCards();
             console.log("After Shuffled: ", shuffled);
             io.in(roomCode).emit("game state update player", { players, shuffled });
@@ -51,7 +51,7 @@ module.exports = (socket: any, io: any) => {
         const room = roomExists(roomCode);
         room.game.addNextClick(playerId);
         const players = room.game.getAllPlayers();
-        if (room.game.next_clicks.length === room.game.players.length) {
+        if (room.game.next_clicks.length >= room.game.players.length) {
             console.log("next turn complete");
             room.game.refillCards();
             room.game.updateRound();

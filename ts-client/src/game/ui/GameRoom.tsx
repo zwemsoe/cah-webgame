@@ -126,7 +126,7 @@ export default function GameRoom(props: Props) {
         if(round > props.setting.rounds) setGameOver(true);
       }
     );
-  });
+  }, [players]);
 
   const extractCurrentPlayer = (players: Player[]) => {
     for (let i = 0; i < players.length; i++) {
