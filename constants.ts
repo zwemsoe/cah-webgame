@@ -2,7 +2,7 @@ export { };
 
 const prod: any = {
     url: {
-        CLIENT_URL: "https://cah-webgame.web.app",
+        CLIENT_URL: "https://cah-webgame-1332a.web.app",
     }
 };
 
