@@ -10,13 +10,13 @@ module.exports = (socket: any, io: any) => {
         io.in(roomCode).emit("game start update");
     });
 
-    socket.on("game state init", async ({ roomCode }: { roomCode: string }) => {
+    socket.on("game state init", ({ roomCode }: { roomCode: string }) => {
         console.log("game init");
         const room = roomExists(roomCode);
         if (room) {
             room.game = new Game(room.users);
             room.game.NSFW = room.settings.toggleNSFW
-            await room.game.init();
+            room.game.init();
             const players = room.game.getAllPlayers();
             const blackCard = room.game.current_black_card;
             io.in(roomCode).emit("game init update", { players, blackCard });

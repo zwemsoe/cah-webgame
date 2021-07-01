@@ -89,7 +89,7 @@ export default function Room({ match, history }: Props) {
   };
 
   const handleStartGame = () => {
-    if(users.length > 1){
+    if(users.length > 2){
       setGameStarted(true);
       socket.emit("start game", { roomCode: roomCode });
       socket.emit("game state init", { roomCode: roomCode });

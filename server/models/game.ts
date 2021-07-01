@@ -1,7 +1,9 @@
 import { User, WhiteCard, BlackCard } from "../interfaces";
 import { Player } from "./player";
 import { nanoid } from "nanoid";
-import axios from "axios";
+import base_cards from "../data/base";
+import family_cards from "../data/family";
+
 
 class Game {
     players: Player[] = [];
@@ -19,8 +21,8 @@ class Game {
         this.assignPlayers(users);
     }
 
-    init = async () => {
-        await this.populateCards();
+    init = () => {
+        this.populateCards();
         this.distributeCards();
         this.drawBlackCard();
     };
@@ -56,27 +58,10 @@ class Game {
         });
     };
 
-    private populateCards = async () => {
-        const res = await axios.get(
-            this.NSFW ? "https://cah.greencoaststudios.com/api/v1/official/main_deck" : "https://api.jsonbin.io/b/602f541b7c58305d3956eb54"
-        );
-        this.black_cards = res.data.black;
-        res.data.black.map((item: any) => {
-            if (item.pick === 1) {
-                const card = {
-                    content: item.content,
-                    draw: item.draw,
-                };
-                this.black_cards.push(card);
-            }
-        });
-        res.data.white.map((item: string) => {
-            const card = {
-                content: item,
-                draw: 1,
-            };
-            this.white_cards.push(card);
-        });
+    private populateCards = () => {
+        const cards = this.NSFW ? base_cards : family_cards;
+        this.white_cards = cards.white;
+        this.black_cards = cards.black;
     };
 
     private distributeCards = () => {
