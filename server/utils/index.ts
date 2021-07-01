@@ -1,6 +1,6 @@
 import { client } from "../redisClient";
 
-const getOnlineUser = async (id: string, cb: any) => {
+export const getOnlineUser = async (id: string, cb: any) => {
   client.get(`online:${id}`, (err: any, socketId: any) => {
     if (socketId) {
       cb(socketId);
@@ -8,18 +8,12 @@ const getOnlineUser = async (id: string, cb: any) => {
   });
 };
 
-const setOnlineUser = (userId: string, expiresIn: number, socketId: string) => {
+export const setOnlineUser = (userId: string, expiresIn: number, socketId: string) => {
   client.setex(`online:${userId}`, expiresIn, socketId);
 };
 
-const deleteOnlineUser = (userId: string) => {
+export const deleteOnlineUser = (userId: string) => {
   client.del(`online:${userId}`);
-};
-
-module.exports = {
-  getOnlineUser,
-  setOnlineUser,
-  deleteOnlineUser,
 };
 
 

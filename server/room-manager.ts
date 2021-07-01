@@ -1,23 +1,9 @@
 import { User, Room, Setting } from "./interfaces";
-import moment from 'moment';
 
 export let rooms: Room[] = [];
 
 const printRooms = () => {
   console.log(rooms);
-}
-
-const cleanUpExpiredRooms = () => {
-  for (let i = 0; i < rooms.length; i++) {
-    const d1 = moment(rooms[i].startTime);
-    const d2 = moment();
-    const diff = moment.duration(d2.diff(d1)).as('hours');
-    console.log(diff);
-    if (diff > 3) {
-      console.log("deleting room: " + rooms[i].id)
-      deleteRoom(rooms[i].id);
-    }
-  }
 }
 
 const addUser = (roomId: string, clientName: string, clientId: string, socketId: string) => {
@@ -98,7 +84,6 @@ const getUserNameById = (socketId: string) => {
 
 export {
   printRooms,
-  cleanUpExpiredRooms,
   addUser,
   createRoom,
   roomExists,
