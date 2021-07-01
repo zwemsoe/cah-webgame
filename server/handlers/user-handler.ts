@@ -1,4 +1,4 @@
-const {
+import {
   addUser,
   createRoom,
   roomExists,
@@ -7,7 +7,7 @@ const {
   getRoomSettings,
   deleteRoom,
   getUserNameById,
-} = require("../room-manager");
+} from "../room-manager";
 import { Setting } from "../interfaces";
 
 module.exports = (socket: any, io: any) => {
@@ -56,7 +56,7 @@ module.exports = (socket: any, io: any) => {
   );
 
   socket.on("get room setting", ({ roomCode }: { roomCode: string }) => {
-    const settings: Setting = getRoomSettings(roomCode);
+    const settings = getRoomSettings(roomCode);
     io.in(roomCode).emit("setting update", { settings });
   });
 

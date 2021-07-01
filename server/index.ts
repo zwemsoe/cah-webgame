@@ -1,11 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import { default as sockets } from './sockets';
-const schedule = require('node-schedule');
-const { cleanUpExpiredRooms } = require('./room-manager');
+import schedule from 'node-schedule';
+import { cleanUpExpiredRooms } from './room-manager';
+import http from 'http';
 
 const app = express();
-const server = require("http").createServer(app);
+const server = http.createServer(app);
 
 app.use(cors());
 sockets(server);

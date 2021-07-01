@@ -1,5 +1,5 @@
 import { User, Room, Setting } from "./interfaces";
-const moment = require('moment');
+import moment from 'moment';
 
 export let rooms: Room[] = [];
 
@@ -96,7 +96,7 @@ const getUserNameById = (socketId: string) => {
   }
 }
 
-module.exports = {
+export {
   printRooms,
   cleanUpExpiredRooms,
   addUser,
@@ -106,5 +106,5 @@ module.exports = {
   changeRoomSettings,
   getRoomSettings,
   deleteRoom,
-  getUserNameById
+  getUserNameById,
 };
