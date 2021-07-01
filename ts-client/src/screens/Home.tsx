@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Navbar } from "../components/Navbar";
 import { SocketContext } from "../contexts/SocketContext";
-import { v4 as uuid } from 'uuid';
+import { nanoid } from 'nanoid';
 
 interface Props {
   history: any,
@@ -20,7 +20,7 @@ export default function Home({ history, setClientName, match }: Props) {
     if(match.params.roomId){
       setCode(roomCode);
     } else {
-      setCode(uuid());
+      setCode(nanoid());
     }
   }, [match.params.roomId]);
 
@@ -28,7 +28,7 @@ export default function Home({ history, setClientName, match }: Props) {
     if(name){
       setLoading(true);
 
-      const clientId = uuid();
+      const clientId = nanoid(10);
       socket.emit("join room", {
         roomCode: code,
         clientName: name,

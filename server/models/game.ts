@@ -1,6 +1,6 @@
 import { User, WhiteCard, BlackCard } from "../interfaces";
 import { Player } from "./player";
-import { v4 as uuid } from 'uuid';
+import { nanoid } from "nanoid";
 import axios from "axios";
 
 class Game {
@@ -87,7 +87,7 @@ class Game {
                 if (card.draw === 1) {
                     card.draw--;
                     card.cardOwner = player.id;
-                    card.id = uuid();
+                    card.id = nanoid(8);
                     player.cards.push(card);
                 }
             }
