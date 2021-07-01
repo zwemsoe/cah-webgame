@@ -1,11 +1,25 @@
+import { client } from "../redisClient";
 
-export const randomString = (len:number) => {
-    let result = "";
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    for (let i = 0; i < len; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
+const getOnlineUser = async (id: string, cb: any) => {
+  client.get(`online:${id}`, (err: any, socketId: any) => {
+    if (socketId) {
+      cb(socketId);
+    } else cb(null);
+  });
 };
+
+const setOnlineUser = (userId: string, expiresIn: number, socketId: string) => {
+  client.setex(`online:${userId}`, expiresIn, socketId);
+};
+
+const deleteOnlineUser = (userId: string) => {
+  client.del(`online:${userId}`);
+};
+
+module.exports = {
+  getOnlineUser,
+  setOnlineUser,
+  deleteOnlineUser,
+};
+
 
