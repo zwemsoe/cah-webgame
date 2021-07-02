@@ -17,8 +17,32 @@ class Game {
     next_clicks: string[] = [];
     NSFW: boolean = false;
 
-    constructor(users: User[]) {
-        this.assignPlayers(users);
+    constructor(users: User[] | null, game: Game | null) {
+        if (users) {
+            this.assignPlayers(users);
+        } else if (game) {
+            game.players.map((player) => {
+                this.players.push(Player.getPlayerInstance(player));
+            })
+            this.white_cards = game.white_cards;
+            this.black_cards = game.black_cards;
+            this.played_cards = game.played_cards;
+            this.current_black_card = game.current_black_card;
+            this.judge_index = game.judge_index;
+            this.round_index = game.round_index;
+            this.round = game.round;
+            this.next_clicks = game.next_clicks;
+            this.NSFW = game.NSFW;
+        }
+
+    }
+
+    static getNewGameInstance(users: User[]) {
+        return new Game(users, null);
+    }
+
+    static getGameInstance(game: Game) {
+        return new Game(null, game);
     }
 
     init = () => {
@@ -52,7 +76,7 @@ class Game {
         this.round_index =
             random_judge === 0 ? users.length - 1 : random_judge - 1;
         users.map((user: User, i) => {
-            const player = new Player(user);
+            const player = Player.getNewPlayerInstance(user);
             if (i === random_judge) player.isJudge = true;
             this.players.push(player);
         });

@@ -1,12 +1,11 @@
 import {
   addUser,
   createRoom,
-  roomExists,
+  getRoom,
   getAllUsers,
   changeRoomSettings,
   getRoomSettings,
   deleteRoom,
-  getUserNameById,
 } from "../room-manager";
 import { Setting } from "../interfaces";
 
@@ -16,7 +15,7 @@ module.exports = (socket: any, io: any) => {
   //joining a room
   socket.on(
     "join room",
-    ({
+    async ({
       roomCode,
       clientName,
       clientId,
@@ -29,18 +28,20 @@ module.exports = (socket: any, io: any) => {
         "Room Code: " + roomCode + ", Name: " + clientName + ", Id: " + clientId
       );
       socket.join(roomCode);
-      if (!roomExists(roomCode)) {
-        createRoom(roomCode);
+      const room = await getRoom(roomCode);
+      console.log("room: ", room);
+      if (!room) {
+        await createRoom(roomCode);
       }
-      addUser(roomCode, clientName, clientId, socket.id);
+      await addUser(roomCode, clientName, clientId, socket.id);
     }
   );
 
   //getting room users
-  socket.on("get room users", ({ roomCode }: { roomCode: string }) => {
-    const clients = getAllUsers(roomCode);
-    const settings = getRoomSettings(roomCode);
-    console.log("Clients", clients);
+  socket.on("get room users", async ({ roomCode }: { roomCode: string }) => {
+    const clients = await getAllUsers(roomCode);
+    const settings = await getRoomSettings(roomCode);
+    console.log("Clients: ", clients);
     io.in(roomCode).emit("room status", { clients });
     io.in(roomCode).emit("setting update", { settings });
   });
@@ -48,26 +49,25 @@ module.exports = (socket: any, io: any) => {
   //changing settings
   socket.on(
     "change setting",
-    ({ settings, roomCode }: { settings: Setting; roomCode: string }) => {
+    async ({ settings, roomCode }: { settings: Setting; roomCode: string }) => {
       console.log("change settings to ", settings);
-      changeRoomSettings(settings, roomCode);
+      await changeRoomSettings(settings, roomCode);
       io.in(roomCode).emit("setting update", { settings });
     }
   );
 
-  socket.on("get room setting", ({ roomCode }: { roomCode: string }) => {
-    const settings = getRoomSettings(roomCode);
+  socket.on("get room setting", async ({ roomCode }: { roomCode: string }) => {
+    const settings = await getRoomSettings(roomCode);
     io.in(roomCode).emit("setting update", { settings });
   });
 
   socket.on("delete room", async ({ roomCode }: { roomCode: string }) => {
     console.log("deleting room");
-    deleteRoom(roomCode);
+    await deleteRoom(roomCode);
   });
 
   //user leaves
   socket.on("disconnect", (reason: any) => {
-    const name = getUserNameById(socket.id);
-    console.log(name + " disconnected because of " + reason);
+    console.log("disconnecting!")
   });
 };

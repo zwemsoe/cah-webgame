@@ -6,7 +6,6 @@ export interface User {
 }
 
 export interface Room {
-    id: string,
     users: User[],
     settings: Setting,
     game: any,

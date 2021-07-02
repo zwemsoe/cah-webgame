@@ -1,7 +1,9 @@
 import { Game } from "../models/game";
 import {
-    roomExists,
+    getRoom,
+    setRoom
 } from "../room-manager";
+import { config } from "../constants"
 
 
 module.exports = (socket: any, io: any) => {
@@ -10,15 +12,16 @@ module.exports = (socket: any, io: any) => {
         io.in(roomCode).emit("game start update");
     });
 
-    socket.on("game state init", ({ roomCode }: { roomCode: string }) => {
+    socket.on("game state init", async ({ roomCode }: { roomCode: string }) => {
         console.log("game init");
-        const room = roomExists(roomCode);
+        const room = await getRoom(roomCode);
         if (room) {
-            room.game = new Game(room.users);
+            room.game = Game.getNewGameInstance(room.users);
             room.game.NSFW = room.settings.toggleNSFW
             room.game.init();
             const players = room.game.getAllPlayers();
             const blackCard = room.game.current_black_card;
+            await setRoom(roomCode, config.ROOM_EXPIRY, room)
             io.in(roomCode).emit("game init update", { players, blackCard });
         }
 
@@ -26,11 +29,12 @@ module.exports = (socket: any, io: any) => {
 
     socket.on("card select by player", async ({ cardId, playerId, roomCode }: { cardId: string, playerId: string, roomCode: string }) => {
         console.log("select card by player");
-        const room = roomExists(roomCode);
+        const room = await getRoom(roomCode);
         if (room) {
             room.game.playCard(cardId, playerId);
             const players = room.game.getAllPlayers();
             const playedCards = room.game.played_cards;
+            await setRoom(roomCode, config.ROOM_EXPIRY, room)
             console.log("Played Cards: ", playedCards);
             if (playedCards.length >= players.length - 1) {
                 const shuffled = room.game.shufflePlayedCards();
@@ -45,11 +49,12 @@ module.exports = (socket: any, io: any) => {
 
     socket.on("card select by judge", async ({ cardId, playerId, roomCode }: { cardId: string, playerId: string, roomCode: string }) => {
         console.log("select card by judge");
-        const room = roomExists(roomCode);
+        const room = await getRoom(roomCode);
         if (room) {
             const winnerCard = room.game.pickWinnerCard(cardId);
             const players = room.game.getAllPlayers();
             room.game.setPlayersSubmitClicksToFalse();
+            await setRoom(roomCode, config.ROOM_EXPIRY, room)
             io.in(roomCode).emit("game state update judge", { players, winnerCard });
         }
 
@@ -57,7 +62,7 @@ module.exports = (socket: any, io: any) => {
 
     socket.on("next turn", async ({ roomCode, playerId }: { roomCode: string, playerId: string }) => {
         console.log("next turn");
-        const room = roomExists(roomCode);
+        const room = await getRoom(roomCode);
         if (room) {
             room.game.addNextClick(playerId);
             const players = room.game.getAllPlayers();
@@ -73,8 +78,10 @@ module.exports = (socket: any, io: any) => {
                 const players = room.game.getAllPlayers();
                 const blackCard = room.game.current_black_card;
                 const round = room.game.round;
+                await setRoom(roomCode, config.ROOM_EXPIRY, room)
                 io.in(roomCode).emit("next turn client", { players, blackCard, round });
             } else {
+                await setRoom(roomCode, config.ROOM_EXPIRY, room)
                 io.in(roomCode).emit("players update", { players });
             }
         }

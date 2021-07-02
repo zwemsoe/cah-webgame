@@ -1,15 +1,11 @@
 import { User, Room, Setting } from "./interfaces";
+import { getRoom, deleteRoom, setRoom } from "./utils";
+import { config } from './constants';
 
-export let rooms: Room[] = [];
-
-const printRooms = () => {
-  console.log(rooms);
-}
-
-const addUser = (roomId: string, clientName: string, clientId: string, socketId: string) => {
-  const selected_room = rooms.find((room) => room.id === roomId);
-  if (selected_room) {
-    const users = selected_room.users;
+const addUser = async (roomId: string, clientName: string, clientId: string, socketId: string) => {
+  const room = await getRoom(roomId);
+  if (room) {
+    const users = room.users;
     const user: User = {
       id: clientId,
       name: clientName,
@@ -18,11 +14,11 @@ const addUser = (roomId: string, clientName: string, clientId: string, socketId:
     };
     users.push(user);
   }
+  await setRoom(roomId, config.ROOM_EXPIRY, room)
 };
 
-const createRoom = (roomId: string) => {
+const createRoom = async (roomId: string) => {
   const room: Room = {
-    id: roomId,
     users: [],
     settings: {
       rounds: 3,
@@ -31,65 +27,38 @@ const createRoom = (roomId: string) => {
     game: null,
     startTime: new Date(),
   };
-  rooms.push(room);
+  await setRoom(roomId, config.ROOM_EXPIRY, room)
 };
 
-const roomExists = (roomId: string) => {
-  return rooms.find((room) => room.id === roomId);
-};
-
-const getAllUsers = (roomId: string) => {
-  const selected_room = rooms.find((room) => room.id === roomId);
-  if (selected_room) {
-    const room_users = selected_room.users;
-    return room_users;
+const getAllUsers = async (roomId: string) => {
+  const room = await getRoom(roomId);
+  if (room) {
+    return room.users;
   }
 };
 
-const changeRoomSettings = (settings: Setting, roomCode: string) => {
-  const room = roomExists(roomCode);
+const changeRoomSettings = async (settings: Setting, roomCode: string) => {
+  const room = await getRoom(roomCode);
   if (room) {
     room.settings = settings;
+    await setRoom(roomCode, config.ROOM_EXPIRY, room)
   }
 };
 
-const getRoomSettings = (roomCode: string) => {
-  const room = roomExists(roomCode);
+const getRoomSettings = async (roomCode: string) => {
+  const room = await getRoom(roomCode);
   if (room) {
     return room.settings;
   }
 };
 
-const deleteRoom = (roomCode: string) => {
-  const room = roomExists(roomCode);
-  if (room) {
-    const filtered = rooms.filter((item, index, arr) => {
-      return item.id !== room.id;
-    });
-    rooms = filtered;
-  }
-}
-
-const getUserNameById = (socketId: string) => {
-  for (let i = 0; i < rooms.length; i++) {
-    const room = rooms[i];
-    for (let j = 0; j < room.users.length; j++) {
-      const user = room.users[j];
-      if (user.socketId === socketId) {
-        return user.name;
-      }
-    }
-  }
-}
-
 export {
-  printRooms,
   addUser,
   createRoom,
-  roomExists,
+  getRoom,
+  setRoom,
   getAllUsers,
   changeRoomSettings,
   getRoomSettings,
   deleteRoom,
-  getUserNameById,
 };
