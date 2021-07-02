@@ -6,8 +6,9 @@ import {
   changeRoomSettings,
   getRoomSettings,
   deleteRoom,
+  leaveRoom
 } from "../room-manager";
-import { Setting } from "../interfaces";
+import { Setting, User } from "../interfaces";
 
 module.exports = (socket: any, io: any) => {
   console.log("a user connected");
@@ -29,11 +30,16 @@ module.exports = (socket: any, io: any) => {
       );
       socket.join(roomCode);
       const room = await getRoom(roomCode);
-      console.log("room: ", room);
       if (!room) {
         await createRoom(roomCode);
+        await addUser(roomCode, clientName, clientId, socket.id);
+      } else {
+        const userExists = room.users.findIndex((user: User) => user.id === clientId);
+        if (userExists === -1) {
+          await addUser(roomCode, clientName, clientId, socket.id);
+        }
       }
-      await addUser(roomCode, clientName, clientId, socket.id);
+      socket.clientId = clientId;
     }
   );
 
@@ -63,11 +69,24 @@ module.exports = (socket: any, io: any) => {
 
   socket.on("delete room", async ({ roomCode }: { roomCode: string }) => {
     console.log("deleting room");
-    await deleteRoom(roomCode);
+    const room = await getRoom(roomCode);
+    if (room) {
+      await deleteRoom(roomCode);
+    }
   });
+
+  socket.on("leave room", async ({ roomCode, cb }: { roomCode: string, cb: () => void }) => {
+    await leaveRoom(roomCode, socket.id);
+    const clients = await getAllUsers(roomCode);
+    socket.leave(roomCode);
+    io.in(roomCode).emit("room status", { clients });
+  })
 
   //user leaves
   socket.on("disconnect", (reason: any) => {
     console.log("disconnecting!")
+    if (socket.clientId) {
+      delete socket.clientId;
+    }
   });
 };

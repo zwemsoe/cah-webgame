@@ -33,6 +33,7 @@ const createRoom = async (roomId: string) => {
 const getAllUsers = async (roomId: string) => {
   const room = await getRoom(roomId);
   if (room) {
+    console.log(room.users)
     return room.users;
   }
 };
@@ -52,6 +53,17 @@ const getRoomSettings = async (roomCode: string) => {
   }
 };
 
+const leaveRoom = async (roomCode: string, socketId: string) => {
+  const room = await getRoom(roomCode);
+  if (room) {
+    const index = room.users.findIndex((user: User) => user.socketId === socketId);
+    if (index > -1) {
+      room.users.splice(index, 1);
+      await setRoom(roomCode, config.ROOM_EXPIRY, room)
+    }
+  }
+}
+
 export {
   addUser,
   createRoom,
@@ -61,4 +73,5 @@ export {
   changeRoomSettings,
   getRoomSettings,
   deleteRoom,
+  leaveRoom
 };

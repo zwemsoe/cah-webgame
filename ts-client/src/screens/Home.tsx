@@ -24,6 +24,10 @@ export default function Home({ history, setClientName, match }: Props) {
     }
   }, [match.params.roomId]);
 
+  useEffect(() => {
+    return () => console.log("unmounting")
+  }, [])
+
   const handleJoin = () => {
     if(name){
       setLoading(true);

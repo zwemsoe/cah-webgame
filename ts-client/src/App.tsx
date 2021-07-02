@@ -3,13 +3,13 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Home from "./screens/Home";
 import Room from './screens/Room';
 import {SocketContext, socket} from './contexts/SocketContext';
+import { fetchFromLocalStorage } from "./utils";
 
 const App = () => {
-  const [clientName, setClientName] = useState<string>("");
+  const [clientName, setClientName] = useState<string | null>(fetchFromLocalStorage('current-user'));
 
   useEffect(() => {
     return () => {
-      console.log("unmounting");
       socket.close();
     };
   }, []);

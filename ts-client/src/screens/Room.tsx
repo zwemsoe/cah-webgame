@@ -4,6 +4,7 @@ import { SocketContext } from "../contexts/SocketContext";
 import GameRoom from "../game/ui/GameRoom";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { User, Setting } from "../interfaces";
+import {removeFromLocalStorage} from "../utils"
 
 interface Props {
   history: any;
@@ -17,14 +18,14 @@ var defaultSetting: Setting = {
 
 export default function Room({ match, history }: Props) {
   const roomCode = match.params.roomId;
-  const [users, setUsers] = useLocalStorage(`room-Users-${roomCode}`, []);
+  const [users, setUsers] = useLocalStorage(`room-users`, []);
   const [hostUser, setHostUser] = useLocalStorage(
-    `host-User-${roomCode}`,
-    undefined
+    `host-user`,
+    null
   );
   const [currentUser, setCurrentUser] = useLocalStorage(
-    `current-User-${history.location.state.clientId}`,
-    undefined
+    `current-user`,
+    null
   );
   const [lastJoined, setLastJoined] = useState<number | null>(null);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -33,6 +34,25 @@ export default function Room({ match, history }: Props) {
   settingRef.current = setting;
   
   const socket = useContext(SocketContext);
+
+  const cleanUpLocalStorage = () => {
+    removeFromLocalStorage('room-users');
+    removeFromLocalStorage('host-user');
+    removeFromLocalStorage('current-user');
+  }
+
+  useEffect(() => () => cleanUpLocalStorage(), [])
+
+  useEffect(() => {
+    if(currentUser){
+      socket.emit("join room", {
+        roomCode: roomCode,
+        clientName: currentUser.name,
+        clientId: currentUser.id,
+      });
+    }
+  }, []);
+
 
   useEffect(() => {
     socket.emit("get room users", {
@@ -43,12 +63,13 @@ export default function Room({ match, history }: Props) {
 
   useEffect(() => {
     socket.on("room status", ({ clients }: { clients: User[] }) => {
+      console.log(clients);
       setUsers(clients);
-      if (clients.length !== 0) {
-        setLastJoined(clients.length - 1);
+      if (clients.length > 0) {
+        clients.length > 1 && setLastJoined(clients.length - 1);
         setHostUser(clients[0]);
         var id: string | undefined = history.location.state.clientId;
-        setCurrentUser(clients.find((client) => client.id === id));
+        id && setCurrentUser(clients.find((client) => client.id === id));
       }
     });
   }, [users, socket]);
@@ -97,6 +118,11 @@ export default function Room({ match, history }: Props) {
       alert("Not enough players.")
     }
   };
+
+  const handleLeaveRoom = () => {
+    socket.emit("leave room", { roomCode });
+    history.push("/");
+  };
   
 
   return (
@@ -113,6 +139,7 @@ export default function Room({ match, history }: Props) {
           lastJoined={lastJoined}
           handleStartGame={handleStartGame}
           match={match}
+          handleLeaveRoom = {handleLeaveRoom}
         />
       )}
     </>

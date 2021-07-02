@@ -3,3 +3,8 @@ export const fetchFromLocalStorage = (key: string) => {
   if (jsonValue !== null) return JSON.parse(jsonValue);
 }
 
+export const removeFromLocalStorage = (key: string) => {
+  localStorage.removeItem('cah-webgame-' + key);
+}
+
+

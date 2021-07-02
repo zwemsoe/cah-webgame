@@ -8,6 +8,7 @@ interface Props {
   lastJoined: number | null;
   handleSetting: (e: any) => void;
   handleStartGame: () => void;
+  handleLeaveRoom: () => void;
   match: any;
 }
 
@@ -60,6 +61,7 @@ export default function Lobby(props: Props) {
             >
               Start Game
             </button>
+            
           </div>
         );
       } else {
@@ -100,8 +102,8 @@ export default function Lobby(props: Props) {
   return (
     <>
       <p className="font-extrabold">
-        {props.lastJoined !== null &&
-          props.players[props.lastJoined].name + " joined."}
+        {props.lastJoined &&
+          props.players[props.lastJoined] && props.players[props.lastJoined].name + " joined."}
       </p>
       <p className="font-bold">Players List:</p>
       <ul className="mb-5">
@@ -124,6 +126,12 @@ export default function Lobby(props: Props) {
           {window.location.origin + props.match.url}
         </span>
       </p>
+      <button
+              className="bg-gray-500 hover:bg-gray-300 text-black font-bold h-10 w-28 rounded mt-5"
+              onClick={props.handleLeaveRoom}
+            >
+              Leave Room
+            </button>
     </>
   );
 }
