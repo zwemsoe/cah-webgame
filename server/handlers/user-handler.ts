@@ -6,12 +6,13 @@ import {
   changeRoomSettings,
   getRoomSettings,
   deleteRoom,
-  leaveRoom
+  leaveRoom,
+  updateUserSocketId,
+  getUserSocketId
 } from "../room-manager";
 import { Setting, User } from "../interfaces";
 
 module.exports = (socket: any, io: any) => {
-  console.log("a user connected");
 
   //joining a room
   socket.on(
@@ -37,17 +38,30 @@ module.exports = (socket: any, io: any) => {
         const userExists = room.users.findIndex((user: User) => user.id === clientId);
         if (userExists === -1) {
           await addUser(roomCode, clientName, clientId, socket.id);
+        } else {
+          await updateUserSocketId(roomCode, clientId, socket.id)
         }
       }
       socket.clientId = clientId;
+      const clients = await getAllUsers(roomCode);
+      socket.broadcast.to(roomCode).emit("update peers", clients);
     }
   );
+
+  socket.on("sending signal", async ({ signal, callerId, userToSignal, roomCode }: { signal: any, callerId: string, userToSignal: string, roomCode: string }) => {
+    const socketId = await getUserSocketId(roomCode, userToSignal);
+    io.to(socketId).emit('peer joined', { signal: signal, callerId: callerId });
+  });
+
+  socket.on("returning signal", async ({ signal, callerId, roomCode, clientId }: { signal: any, callerId: string, roomCode: string, clientId: string }) => {
+    const socketId = await getUserSocketId(roomCode, callerId);
+    io.to(socketId).emit('receiving returned signal', { signal, id: clientId });
+  });
 
   //getting room users
   socket.on("get room users", async ({ roomCode }: { roomCode: string }) => {
     const clients = await getAllUsers(roomCode);
     const settings = await getRoomSettings(roomCode);
-    console.log("Clients: ", clients);
     io.in(roomCode).emit("room status", { clients });
     io.in(roomCode).emit("setting update", { settings });
   });
@@ -56,7 +70,6 @@ module.exports = (socket: any, io: any) => {
   socket.on(
     "change setting",
     async ({ settings, roomCode }: { settings: Setting; roomCode: string }) => {
-      console.log("change settings to ", settings);
       await changeRoomSettings(settings, roomCode);
       io.in(roomCode).emit("setting update", { settings });
     }

@@ -2,22 +2,6 @@ import { Room, User } from "../interfaces";
 import { Game } from "../models/game";
 import { client } from "../redisClient";
 
-// export const getOnlineUser = async (id: string, cb: any) => {
-//   client.get(`online:${id}`, (err: any, socketId: any) => {
-//     if (socketId) {
-//       cb(socketId);
-//     } else cb(null);
-//   });
-// };
-
-// export const setOnlineUser = (userId: string, expiresIn: number, socketId: string) => {
-//   client.setex(`online:${userId}`, expiresIn, socketId);
-// };
-
-// export const deleteOnlineUser = (userId: string) => {
-//   client.del(`online:${userId}`);
-// };
-
 function fix(obj: any) {
   for (var property in obj) {
     if (obj.hasOwnProperty(property)) {
@@ -45,12 +29,12 @@ export const deleteRoom = (id: string) => {
 }
 
 export const getUser = async (id: string) => {
-  const user = await client.get(`user:${id}`);
-  return JSON.parse(user);
+  const socketId = await client.get(`user:${id}`);
+  return JSON.parse(socketId);
 }
 
-export const setUser = (userId: string, expiresIn: number, user: User) => {
-  return client.setex(`user:${userId}`, expiresIn, JSON.stringify(user));
+export const setUser = (userId: string, expiresIn: number, socketId: string) => {
+  return client.setex(`user:${userId}`, expiresIn, JSON.stringify(socketId));
 }
 
 export const deleteUser = (id: string) => {

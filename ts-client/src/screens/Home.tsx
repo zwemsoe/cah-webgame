@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Navbar } from "../components/Navbar";
 import { SocketContext } from "../contexts/SocketContext";
 import { nanoid } from 'nanoid';
+import { cleanUpLocalStorage } from "../utils";
 
 interface Props {
   history: any,
@@ -25,6 +26,7 @@ export default function Home({ history, setClientName, match }: Props) {
   }, [match.params.roomId]);
 
   useEffect(() => {
+    cleanUpLocalStorage();
     return () => console.log("unmounting")
   }, [])
 
@@ -40,7 +42,7 @@ export default function Home({ history, setClientName, match }: Props) {
       });
 
       setTimeout(() => {
-        history.push("/game/" + code, { clientId });
+        history.push("/game/" + code, { clientId, clientName: name });
         setClientName(name);
       }, 2000);
     } else {

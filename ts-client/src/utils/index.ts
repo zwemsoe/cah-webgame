@@ -7,4 +7,9 @@ export const removeFromLocalStorage = (key: string) => {
   localStorage.removeItem('cah-webgame-' + key);
 }
 
+export const cleanUpLocalStorage = () => {
+  removeFromLocalStorage('room-users');
+  removeFromLocalStorage('host-user');
+  removeFromLocalStorage('current-user');
+}
 
