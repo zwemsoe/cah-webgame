@@ -2,7 +2,7 @@ export { };
 
 const prod: any = {
     url: {
-        API_URL: "https://cah-project-server.herokuapp.com/",
+        API_URL: "https://cah-backend.herokuapp.com",
     }
 };
 

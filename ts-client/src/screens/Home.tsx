@@ -10,11 +10,6 @@ interface Props {
   match: any,
 }
 
-const videoConstraints = {
-  height: window.innerHeight / 2,
-  width: window.innerWidth / 2
-};
-
 export default function Home({ history, setClientName, match }: Props) {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -32,12 +27,6 @@ export default function Home({ history, setClientName, match }: Props) {
 
   useEffect(() => {
     cleanUpLocalStorage();
-    navigator.mediaDevices.getUserMedia({video: videoConstraints, audio: true})
-      .then(mediaStream => {
-        const stream = mediaStream;
-        const tracks = stream.getTracks();
-        if(tracks.length > 0) tracks[0].stop();
-    });
   }, [])
 
   const handleJoin = () => {

@@ -6,11 +6,16 @@ import http from 'http';
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'https://cah-online-e8c46.web.app'],
+  })
+);
+
 sockets(server);
 
 app.get('/', (req, res) => {
-  res.send("Serving for app deployed at https://cah-webgame.web.app")
+  res.send("Serving for app deployed at https://cah-online-e8c46.web.app")
 });
 
 const port = process.env.PORT || 5000;

@@ -19,20 +19,14 @@ var defaultSetting: Setting = {
 
 const videoConstraints = {
   height: window.innerHeight / 2,
-  width: window.innerWidth / 2
+  width: window.innerWidth / 2,
 };
 
 export default function Room({ match, history }: Props) {
   const roomCode = match.params.roomId;
   const [users, setUsers] = useLocalStorage(`room-users`, []);
-  const [hostUser, setHostUser] = useLocalStorage(
-    `host-user`,
-    null
-  );
-  const [currentUser, setCurrentUser] = useLocalStorage(
-    `current-user`,
-    null
-  );
+  const [hostUser, setHostUser] = useLocalStorage(`host-user`, null);
+  const [currentUser, setCurrentUser] = useLocalStorage(`current-user`, null);
   const [lastJoined, setLastJoined] = useState<number | null>(null);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [setting, changeSetting] = useState<Setting>(defaultSetting);
@@ -44,7 +38,17 @@ export default function Room({ match, history }: Props) {
   const peersRef = useRef<any>([]);
 
   const socket = useContext(SocketContext);
-  
+
+  useEffect(() => () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: videoConstraints, audio: true })
+      .then((mediaStream) => {
+        const stream = mediaStream;
+        const tracks = stream.getTracks();
+        if (tracks.length > 0) tracks[0].stop();
+      });
+  }, []);
+
   useEffect(() => {
     const { clientId, clientName } = history.location.state;
     socket.emit("join room", {
@@ -56,18 +60,22 @@ export default function Room({ match, history }: Props) {
 
   useEffect(() => {
     const { clientId } = history.location.state;
-    navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true }).then(stream => {
-      userVideo.current && (userVideo.current.srcObject = stream);
-      
-      socket.emit("join video chat", roomCode);
+    navigator.mediaDevices
+      .getUserMedia({ video: videoConstraints, audio: true })
+      .then((stream) => {
+        userVideo.current && (userVideo.current.srcObject = stream);
 
-      socket.on("update peers", (users) => {
-        let new_peers = [];
-        users.forEach((user: any) => {
-            if (user.id !== clientId){
+        socket.emit("join video chat", roomCode);
+
+        socket.on("update peers", (users) => {
+          let new_peers = [];
+          users.forEach((user: any) => {
+            if (user.id !== clientId) {
               const peer = createPeer(user.id, clientId, stream);
-              const peerExists = peersRef.current.findIndex((p) => p.peerId === user.id);
-              if(peerExists > -1){
+              const peerExists = peersRef.current.findIndex(
+                (p) => p.peerId === user.id
+              );
+              if (peerExists > -1) {
                 peersRef.current.splice(peerExists, 1);
               }
               peersRef.current.push({
@@ -75,44 +83,49 @@ export default function Room({ match, history }: Props) {
                 peer,
               });
               //@ts-ignore
-              new_peers.push({ peerId: user.id, peer});
-            } 
-        })
-        setPeers(new_peers);
-      })
+              new_peers.push({ peerId: user.id, peer });
+            }
+          });
+          setPeers(new_peers);
+        });
 
-      socket.on("peer joined", payload => {
-        const peer = addPeer(payload.signal, payload.callerId, stream);
-        const peerExists = peersRef.current.findIndex((p) => p.peerId === payload.callerId);
-        if(peerExists > -1){
-          peersRef.current.splice(peerExists, 1);
-        }
-        peersRef.current.push({
+        socket.on("peer joined", (payload) => {
+          const peer = addPeer(payload.signal, payload.callerId, stream);
+          const peerExists = peersRef.current.findIndex(
+            (p) => p.peerId === payload.callerId
+          );
+          if (peerExists > -1) {
+            peersRef.current.splice(peerExists, 1);
+          }
+          peersRef.current.push({
             peerId: payload.callerId,
             peer,
-        })
-        setPeers(users => [...users, {
-          peerId: payload.callerId,
-          peer,
-        }]);
-      });
+          });
+          setPeers((users) => [
+            ...users,
+            {
+              peerId: payload.callerId,
+              peer,
+            },
+          ]);
+        });
 
-      socket.on("receiving returned signal", payload => {
-        const item = peersRef.current.find(p => p.peerId === payload.id);
-        item.peer.signal(payload.signal);
-      });
+        socket.on("receiving returned signal", (payload) => {
+          const item = peersRef.current.find((p) => p.peerId === payload.id);
+          item.peer.signal(payload.signal);
+        });
 
-      socket.on("user left video", (userId) => {
-        const item = peersRef.current.find(p => p.peerId === userId);
-        if(item){
-          item.peer.destroy();
-        }
-        const new_peers = peersRef.current.filter(p => p.peerId !== userId);
-        peersRef.current = new_peers;
-        setPeers(new_peers);
-      })
-    })
-  }, [])
+        socket.on("user left video", (userId) => {
+          const item = peersRef.current.find((p) => p.peerId === userId);
+          if (item) {
+            item.peer.destroy();
+          }
+          const new_peers = peersRef.current.filter((p) => p.peerId !== userId);
+          peersRef.current = new_peers;
+          setPeers(new_peers);
+        });
+      });
+  }, []);
 
   useEffect(() => {
     socket.emit("get room users", {
@@ -154,29 +167,34 @@ export default function Room({ match, history }: Props) {
     });
 
     peer.on("signal", (signal: any) => {
-      socket.emit("sending signal", { userToSignal, callerId, signal, roomCode })
-    })
+      socket.emit("sending signal", {
+        userToSignal,
+        callerId,
+        signal,
+        roomCode,
+      });
+    });
 
     return peer;
-  }
+  };
 
   const addPeer = (incomingSignal: any, callerId: string, stream: any) => {
     const peer = new Peer({
       initiator: false,
       trickle: false,
       stream,
-    })
+    });
 
     const { clientId } = history.location.state;
 
     peer.on("signal", (signal: any) => {
-      socket.emit("returning signal", { signal, callerId, roomCode, clientId })
-    })
+      socket.emit("returning signal", { signal, callerId, roomCode, clientId });
+    });
 
     peer.signal(incomingSignal);
 
     return peer;
-  }
+  };
 
   const handleSetting = (e: any) => {
     const { name, value, checked } = e.target;
@@ -206,7 +224,7 @@ export default function Room({ match, history }: Props) {
       socket.emit("start game", { roomCode: roomCode });
       socket.emit("game state init", { roomCode: roomCode });
     } else {
-      alert("Not enough players.")
+      alert("Not enough players.");
     }
   };
 
@@ -215,13 +233,17 @@ export default function Room({ match, history }: Props) {
     history.push("/");
   };
 
-
   return (
     <>
-      <div className="grid grid-cols-2">
+      <div className='grid grid-cols-2'>
         <div>
           {gameStarted ? (
-            <GameRoom currentUser={currentUser} roomCode={roomCode} setting={settingRef.current} history={history} />
+            <GameRoom
+              currentUser={currentUser}
+              roomCode={roomCode}
+              setting={settingRef.current}
+              history={history}
+            />
           ) : (
             <>
               <Lobby
@@ -235,7 +257,6 @@ export default function Room({ match, history }: Props) {
                 match={match}
                 handleLeaveRoom={handleLeaveRoom}
               />
-
             </>
           )}
         </div>
@@ -243,7 +264,6 @@ export default function Room({ match, history }: Props) {
           <VideoPanel userVideo={userVideo} peers={peers} />
         </div>
       </div>
-
     </>
   );
 }
