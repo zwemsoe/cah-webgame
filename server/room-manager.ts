@@ -77,11 +77,8 @@ const updateUserSocketId = async (
 ) => {
   const room = await getRoom(roomCode);
   if (room) {
-    room.users.forEach((user: User) => {
-      if (user.id === userId) {
-        user.socketId = socketId;
-      }
-    });
+    const index = room.users.findIndex((user: User) => user.id === userId);
+    room.users[index].socketId = socketId;
     await setRoom(roomCode, config.ROOM_EXPIRY, room);
   }
 };

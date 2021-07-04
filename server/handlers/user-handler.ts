@@ -8,7 +8,6 @@ import {
   deleteRoom,
   leaveRoom,
   updateUserSocketId,
-  getUserSocketId
 } from "../room-manager";
 import { Setting, User } from "../interfaces";
 
@@ -26,9 +25,6 @@ module.exports = (socket: any, io: any) => {
       clientName: string;
       clientId: string;
     }) => {
-      console.log(
-        "Room Code: " + roomCode + ", Name: " + clientName + ", Id: " + clientId
-      );
       socket.join(roomCode);
       const room = await getRoom(roomCode);
       if (!room) {
@@ -43,20 +39,8 @@ module.exports = (socket: any, io: any) => {
         }
       }
       socket.clientId = clientId;
-      const clients = await getAllUsers(roomCode);
-      socket.broadcast.to(roomCode).emit("update peers", clients);
     }
   );
-
-  socket.on("sending signal", async ({ signal, callerId, userToSignal, roomCode }: { signal: any, callerId: string, userToSignal: string, roomCode: string }) => {
-    const socketId = await getUserSocketId(roomCode, userToSignal);
-    io.to(socketId).emit('peer joined', { signal: signal, callerId: callerId });
-  });
-
-  socket.on("returning signal", async ({ signal, callerId, roomCode, clientId }: { signal: any, callerId: string, roomCode: string, clientId: string }) => {
-    const socketId = await getUserSocketId(roomCode, callerId);
-    io.to(socketId).emit('receiving returned signal', { signal, id: clientId });
-  });
 
   //getting room users
   socket.on("get room users", async ({ roomCode }: { roomCode: string }) => {
@@ -88,18 +72,21 @@ module.exports = (socket: any, io: any) => {
     }
   });
 
-  socket.on("leave room", async ({ roomCode, cb }: { roomCode: string, cb: () => void }) => {
+  socket.on("leave room", async ({ roomCode }: { roomCode: string }) => {
     await leaveRoom(roomCode, socket.id);
     const clients = await getAllUsers(roomCode);
     socket.leave(roomCode);
+    socket.broadcast.emit("user left video", socket.clientId);
     io.in(roomCode).emit("room status", { clients });
   })
 
   //user leaves
   socket.on("disconnect", (reason: any) => {
-    console.log("disconnecting!")
+    console.log("disconnecting: ", socket.clientId)
     if (socket.clientId) {
+      socket.broadcast.emit("user left video", socket.clientId);
       delete socket.clientId;
     }
+
   });
 };

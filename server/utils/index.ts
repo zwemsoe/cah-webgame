@@ -28,17 +28,4 @@ export const deleteRoom = (id: string) => {
   return client.del(`room:${id}`);
 }
 
-export const getUser = async (id: string) => {
-  const socketId = await client.get(`user:${id}`);
-  return JSON.parse(socketId);
-}
-
-export const setUser = (userId: string, expiresIn: number, socketId: string) => {
-  return client.setex(`user:${userId}`, expiresIn, JSON.stringify(socketId));
-}
-
-export const deleteUser = (id: string) => {
-  return client.del(`user:${id}`);
-}
-
 

@@ -44,90 +44,75 @@ export default function Room({ match, history }: Props) {
   const peersRef = useRef<any>([]);
 
   const socket = useContext(SocketContext);
-
-  const createPeer = (userToSignal: string, callerId: string, stream: any) => {
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream,
-    });
-
-    peer.on("signal", (signal: any) => {
-      console.log("sending signal")
-      socket.emit("sending signal", { userToSignal, callerId, signal, roomCode })
-    })
-
-    return peer;
-  }
-
-  const addPeer = (incomingSignal: any, callerId: string, stream: any) => {
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream,
-    })
-
-    const { clientId } = history.location.state;
-
-    peer.on("signal", (signal: any) => {
-      console.log("returning signal")
-      socket.emit("returning signal", { signal, callerId, roomCode, clientId })
-    })
-
-    peer.signal(incomingSignal);
-
-    return peer;
-  }
-
+  
   useEffect(() => {
     const { clientId, clientName } = history.location.state;
+    socket.emit("join room", {
+      roomCode: roomCode,
+      clientName: clientName,
+      clientId: clientId,
+    });
+  }, []);
+
+  useEffect(() => {
+    const { clientId } = history.location.state;
     navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true }).then(stream => {
       userVideo.current && (userVideo.current.srcObject = stream);
-      socket.emit("join room", {
-        roomCode: roomCode,
-        clientName: clientName,
-        clientId: clientId,
-      });
+      
+      socket.emit("join video chat", roomCode);
 
       socket.on("update peers", (users) => {
-        console.log("updating peers")
-        let new_peers = peers;
+        let new_peers = [];
         users.forEach((user: any) => {
-          console.log("peerRef: ", peersRef.current);
-          const peerExists = peersRef.current.findIndex((p) => p.peerId === user.id);
-          if (peerExists === -1){
-            const peer = createPeer(user.id, clientId, stream);
-            peersRef.current.push({
-              peerId: user.id,
-              peer,
-            });
-            //@ts-ignore
-            new_peers.push(peer);
-          }
+            if (user.id !== clientId){
+              const peer = createPeer(user.id, clientId, stream);
+              const peerExists = peersRef.current.findIndex((p) => p.peerId === user.id);
+              if(peerExists > -1){
+                peersRef.current.splice(peerExists, 1);
+              }
+              peersRef.current.push({
+                peerId: user.id,
+                peer,
+              });
+              //@ts-ignore
+              new_peers.push({ peerId: user.id, peer});
+            } 
         })
-        console.log("New Peers: ", new_peers)
         setPeers(new_peers);
       })
 
       socket.on("peer joined", payload => {
-        console.log("peer joined");
-        //const peerExists = peersRef.current.findIndex((p) => p.peerId === payload.callerId);
         const peer = addPeer(payload.signal, payload.callerId, stream);
+        const peerExists = peersRef.current.findIndex((p) => p.peerId === payload.callerId);
+        if(peerExists > -1){
+          peersRef.current.splice(peerExists, 1);
+        }
         peersRef.current.push({
             peerId: payload.callerId,
             peer,
         })
-        setPeers(users => [...users, peer]);
+        setPeers(users => [...users, {
+          peerId: payload.callerId,
+          peer,
+        }]);
       });
 
       socket.on("receiving returned signal", payload => {
-        console.log("receiving returned signal")
         const item = peersRef.current.find(p => p.peerId === payload.id);
         item.peer.signal(payload.signal);
       });
-    })
-  }, []);
 
+      socket.on("user left video", (userId) => {
+        const item = peersRef.current.find(p => p.peerId === userId);
+        if(item){
+          item.peer.destroy();
+        }
+        const new_peers = peersRef.current.filter(p => p.peerId !== userId);
+        peersRef.current = new_peers;
+        setPeers(new_peers);
+      })
+    })
+  }, [])
 
   useEffect(() => {
     socket.emit("get room users", {
@@ -138,7 +123,6 @@ export default function Room({ match, history }: Props) {
 
   useEffect(() => {
     socket.on("room status", ({ clients }: { clients: User[] }) => {
-      console.log(clients);
       setUsers(clients);
       if (clients.length > 0) {
         clients.length > 1 && setLastJoined(clients.length - 1);
@@ -162,7 +146,37 @@ export default function Room({ match, history }: Props) {
     });
   });
 
+  const createPeer = (userToSignal: string, callerId: string, stream: any) => {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream,
+    });
 
+    peer.on("signal", (signal: any) => {
+      socket.emit("sending signal", { userToSignal, callerId, signal, roomCode })
+    })
+
+    return peer;
+  }
+
+  const addPeer = (incomingSignal: any, callerId: string, stream: any) => {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    })
+
+    const { clientId } = history.location.state;
+
+    peer.on("signal", (signal: any) => {
+      socket.emit("returning signal", { signal, callerId, roomCode, clientId })
+    })
+
+    peer.signal(incomingSignal);
+
+    return peer;
+  }
 
   const handleSetting = (e: any) => {
     const { name, value, checked } = e.target;

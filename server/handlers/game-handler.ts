@@ -35,10 +35,8 @@ module.exports = (socket: any, io: any) => {
             const players = room.game.getAllPlayers();
             const playedCards = room.game.played_cards;
             await setRoom(roomCode, config.ROOM_EXPIRY, room)
-            console.log("Played Cards: ", playedCards);
             if (playedCards.length >= players.length - 1) {
                 const shuffled = room.game.shufflePlayedCards();
-                console.log("After Shuffled: ", shuffled);
                 io.in(roomCode).emit("game state update player", { players, shuffled });
             } else {
                 io.in(roomCode).emit("players update", { players });

@@ -10,11 +10,12 @@ const StyledVideo = styled.video`
 
 export default function VideoPanel(props) {
   return (
-    <div className="flex flex-col ...">
+    <div className="flex flex-col gap-y-3">
       <StyledVideo muted ref={props.userVideo} autoPlay playsInline />
-          {props.peers.map((peer: any, index: number) => {
+      {/* <button onClick={() => props.userVideo.current.srcObject = null}>Stop Video</button> */}
+          {props.peers.map((peer: any) => {
                 return (
-                    <Video key={index} peer={peer} />
+                    <Video key={peer.peerId} peer={peer.peer} />
                 );
           })}
     </div>
